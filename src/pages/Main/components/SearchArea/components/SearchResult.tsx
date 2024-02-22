@@ -62,7 +62,7 @@ const SearchResult: React.FC<SearchResultProps> = ({
 
 
     return <>
-        <div className="border" key={patientID}>
+        <div className="border-b-4 m-2" key={patientID}>
             <div className="flex flex-column px-3" onClick={OnClick}>
                 <div className="text-2xl font-bold">
                     <span>{patientID}</span>

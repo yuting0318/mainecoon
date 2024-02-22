@@ -10,7 +10,7 @@ const UseableBlank: React.FC = () => {
     return <>
         {/*最外層*/}
         <div className="m-0 p-0 flex-fill">
-            <div className="flex h-100 border-4 border-amber-700">
+            <div className="flex h-100 border-4">
                 <SearchArea />
                 <ImageWithReportArea />
             </div>

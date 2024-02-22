@@ -41,9 +41,10 @@ const SearchHeaderExpandMode: React.FC<SearchHeaderProps> = ({ onMouseHoverHandl
 
 
     return <>
-        <div className=" bg-white border-bottom position-absolute top-0 start-0 w-100" onMouseLeave={onMouseHoverHandler}>
-            <div className="container-fluid">
-                <div className="d-flex flex-fill flex-column">
+        <div className=" bg-white border-bottom position-absolute top-0 start-0 w-100 m-2"
+             onMouseLeave={onMouseHoverHandler}>
+            <div>
+                <div className="flex flex-column">
                     <QueryParameter_PatientID />
                     <QueryParameter_PatientName />
                     <QueryParameter_StudyUID />
@@ -60,9 +61,9 @@ const SearchHeaderExpandMode: React.FC<SearchHeaderProps> = ({ onMouseHoverHandl
 const SearchHeaderLiteMode: React.FC = () => {
 
     return <>
-        <div className="bg-white border-bottom">
+        <div className="bg-white border-bottom m-2">
             <div className="container-fluid">
-                <div className="d-flex flex-fill flex-column">
+                <div className="flex flex-fill flex-column">
                     <QueryParameter_PatientID />
                 </div>
             </div>

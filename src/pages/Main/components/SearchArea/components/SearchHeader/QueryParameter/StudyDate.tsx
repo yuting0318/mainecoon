@@ -15,10 +15,10 @@ const QueryParameter_StudyDate: React.FC = () => {
     }
 
     return <>
-        <div className="d-flex flex-fill mt-2">
+        <div className="d-flex flex-fill mt-2 mb-4">
             <div className="d-flex text-nowrap align-items-center me-2">StudyDate:</div>
             <input
-                className="form-control me-2"
+                className="border-2 p-2 w-100 rounded-lg"
                 value={qidorsParameter.StudyDate}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     let tempQidorsParameter = _.cloneDeep(qidorsParameter);

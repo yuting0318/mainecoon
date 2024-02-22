@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-
 import { useAppSelector, useAppDispatch } from "Hook";
 import { Study, Series, Instance, Frame } from "csy-dicomweb-wado-rs-uri";
 import _ from "lodash";
