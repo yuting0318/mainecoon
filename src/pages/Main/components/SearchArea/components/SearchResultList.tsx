@@ -36,6 +36,7 @@ const SearchResultList: React.FC = () => {
     }
 
     return <>
+        {/*畫面左邊下面*/}
         <div className="flex-fill overflow-y-auto overflow-x-hidden h-0 " onScroll={onScroll} ref={searchResultListRef}>
             {
                 results.map((result) => {

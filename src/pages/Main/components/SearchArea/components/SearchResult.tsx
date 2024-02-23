@@ -12,9 +12,7 @@ type SearchResultProps = {
     qidorsSingleStudy?: qidorsSingleStudyType
 }
 
-const SearchResult: React.FC<SearchResultProps> = ({
-    qidorsSingleStudy
-}) => {
+const SearchResult: React.FC<SearchResultProps> = ({qidorsSingleStudy}) => {
     const dispatch = useAppDispatch();
 
     const imageWithReportReducer = useAppSelector((state) => state.imageWithReportSlice);
@@ -44,7 +42,9 @@ const SearchResult: React.FC<SearchResultProps> = ({
 
 
     function OnClick() {
-        const studyInstanceUID: string = getQidorsSingleStudyMetadataValue(qidorsSingleStudy, QIDO_RS_Response.StudyInstanceUID, "StudyInstanceUID, NotFound");
+        const studyInstanceUID: string =
+            getQidorsSingleStudyMetadataValue(qidorsSingleStudy, QIDO_RS_Response.StudyInstanceUID,
+                "StudyInstanceUID, NotFound");
         dispatch(querySeries(studyInstanceUID));
     }
 
@@ -60,7 +60,7 @@ const SearchResult: React.FC<SearchResultProps> = ({
     const studyDate: string = getQidorsSingleStudyMetadataValue(qidorsSingleStudy, QIDO_RS_Response.StudyDate, "StudyDate NotFound");
 
 
-
+    // 畫面左邊下面的每一筆資料
     return <>
         <div className="border-b-4 m-2" key={patientID}>
             <div className="flex flex-column px-3" onClick={OnClick}>

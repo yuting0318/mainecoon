@@ -47,7 +47,7 @@ const querySeries = createAsyncThunk(
 
         wado.studyInstanceUID = studyInstanceUID;
         await wado.querySeries();
-
+        console.log('我被查了, 我是querySeries, 我的結果是: ', wado.response);
         return wado.response;
     }
 )

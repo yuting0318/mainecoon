@@ -11,8 +11,10 @@ const SearchArea = () => {
     return (
         <>
             {/*左邊底*/}
-            <div className="bg-opacity-10 w-25 flex flex-column border-2 m-2">
+            <div className="bg-opacity-75 w-25 flex flex-column border-2">
+                {/*搜尋框*/}
                 <SearchHeader />
+                {/*搜尋結果*/}
                 <SearchResultList />
             </div>
         </>

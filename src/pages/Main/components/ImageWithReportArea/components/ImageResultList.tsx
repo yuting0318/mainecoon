@@ -15,7 +15,7 @@ const ImageResultList: React.FC = () => {
     return (
         <>
             {!isLoading && (
-                <div className="flex flex-row ">
+                <div className="flex flex-row">
                     {seriesResults?.map((seriesResult, index) => (
                         <ImageResult key={index} wadoSingleSeries={seriesResult} />
                     ))}

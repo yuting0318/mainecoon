@@ -133,7 +133,6 @@ function microscopyViewer(props) {
             smoothExtentConstraint: false,
             projection: dicomProjection,
             extent: extent,
-            smoothExtentConstraint: false,
             showFullExtent: true,
         });
 

@@ -35,9 +35,12 @@ function MicroscopyViewer(props) {
     const [isDrawingEllipse, setIsDrawingEllipse] = useState(false);
     const [ellipseCenter, setEllipseCenter] = useState(null);
     const [ellipsePreview, setEllipsePreview] = useState(null);
+    const [isDrawingRectangle, setIsDrawingRectangle] = useState(false);
+    const [rectangleCenter, setRectangleCenter] = useState(null);
+    const [rectanglePreview, setRectanglePreview] = useState(null);
 
     const savedEllipsesSourceRef = useRef(new VectorSource({ wrapX: false }));
-
+    const savedRectangleSourceRef = useRef(new VectorSource({ wrapX: false }));
     const drawInteractionRef = useRef(null);
 
     useEffect(() => {
@@ -86,6 +89,9 @@ function MicroscopyViewer(props) {
         const savedEllipsesLayer = new VectorLayer({
             source: savedEllipsesSourceRef.current,
         });
+        const savedRectangleLayer = new VectorLayer({
+            source: savedRectangleSourceRef.current,
+        });
         const wsiLayer = new LayerTile({ source: wsiSourceXYZ, extent: extent });
 
         const view = new View({
@@ -98,7 +104,7 @@ function MicroscopyViewer(props) {
         });
 
         const vector = new VectorLayer({ source: sourceRef.current });
-        const layers = [wsiLayer, ...annVectorLayers, vector, savedEllipsesLayer];
+        const layers = [wsiLayer, ...annVectorLayers, vector, savedEllipsesLayer,savedRectangleLayer];
         const mousePositionControl = new MousePosition({
             coordinateFormat: createStringXY(0),
             projection: 'EPSG:4326',
@@ -131,6 +137,7 @@ function MicroscopyViewer(props) {
                     const ellipseCoords = createEllipse(ellipseCenter, radiusX, radiusY);
                     newEllipsePreview.setGeometry(new Polygon([ellipseCoords]));
                     setIsDrawingEllipse(false); // 结束绘制
+                    setEllipseCenter(null);
                 }
             };
 
@@ -145,13 +152,14 @@ function MicroscopyViewer(props) {
 
             mapRef.current.on('singleclick', clickHandler);
             mapRef.current.on('pointermove', moveHandler);
-
             return () => {
                 mapRef.current.un('singleclick', clickHandler);
                 mapRef.current.un('pointermove', moveHandler);
                 sourceRef.current.removeFeature(newEllipsePreview);
             };
         }
+
+
 
         if (!isDrawingEllipse && ellipsePreview) {
             savedEllipsesSourceRef.current.addFeature(new Feature(ellipsePreview.getGeometry())); // 將橢圓添加到保存圖層
@@ -160,6 +168,51 @@ function MicroscopyViewer(props) {
             setEllipsePreview(null); // 重置預覽Feature
         }
     }, [isDrawingEllipse, ellipseCenter]);
+
+    useEffect(() => {
+        // 如果正在绘制椭圆，添加事件监听
+        if (isDrawingRectangle) {
+            const newRectanglePreview = new Feature();
+            setRectanglePreview(newRectanglePreview);
+            sourceRef.current.addFeature(newRectanglePreview);
+
+            const clickHandler = (event) => {
+                if (!rectangleCenter) {
+                    setRectangleCenter(event.coordinate);
+                } else {
+                    const radiusX = calculateRadius(event.coordinate, rectangleCenter);
+                    const radiusY = radiusX / 2; // 假设Y轴半径为X轴的一半
+                    const rectangleCoords = createRectangle(rectangleCenter, radiusX, radiusY);
+                    newRectanglePreview.setGeometry(new Polygon([rectangleCoords]));
+                    setIsDrawingRectangle(false); // 结束绘制
+                    setRectangleCenter(null); // 重置中心
+                }
+            };
+
+            const moveHandler = (event) => {
+                if (rectangleCenter) {
+                    const radiusX = calculateRadius(event.coordinate, rectangleCenter);
+                    const radiusY = radiusX / 2; // 同上
+                    const rectangleCoords = createRectangle(rectangleCenter, radiusX, radiusY);
+                    newRectanglePreview.setGeometry(new Polygon([rectangleCoords]));
+                }
+            };
+
+            mapRef.current.on('singleclick', clickHandler);
+            mapRef.current.on('pointermove', moveHandler);
+
+            return () => {
+                mapRef.current.un('singleclick', clickHandler);
+                mapRef.current.un('pointermove', moveHandler);
+                sourceRef.current.removeFeature(newRectanglePreview);
+            };
+        }
+    if (!isDrawingRectangle && rectanglePreview) {
+        savedRectangleSourceRef.current.addFeature(new Feature(rectanglePreview.getGeometry())); // 將橢圓添加到保存圖層
+        rectanglePreview.setGeometry(null); // 清除預覽圖層中的橢圓
+        sourceRef.current.removeFeature(rectanglePreview); // 從原來的圖層中移除
+        setRectanglePreview(null); // 重置預覽Feature
+    }}, [isDrawingRectangle, rectangleCenter]);
 
     const updateDrawType = (type) => {
         // 如果当前正在绘制椭圆，则处理椭圆的结束逻辑
@@ -171,6 +224,14 @@ function MicroscopyViewer(props) {
                 setEllipsePreview(null);
             }
             setEllipseCenter(null);
+        }else if(isDrawingRectangle){
+            setIsDrawingRectangle(false);
+            if (rectanglePreview) {
+                rectanglePreview.setGeometry(null);
+                sourceRef.current.removeFeature(rectanglePreview);
+                setRectanglePreview(null);
+            }
+            setRectangleCenter(null);
         }
 
         // 移除当前的绘图交互（如果存在）
@@ -182,7 +243,11 @@ function MicroscopyViewer(props) {
         // 对于椭圆，设置相关状态以启用特殊的椭圆绘图逻辑
         if (type === 'Ellipse') {
             setIsDrawingEllipse(true);
-        } else {
+            console.log("我再畫元形")
+        }else if (type === 'Rectangle') {
+            setIsDrawingRectangle(true);
+            console.log("我再畫長方形")
+        }else {
             // 为其他绘图类型创建 Draw 交互
             const drawInteraction = new Draw({
                 source: sourceRef.current,
@@ -214,6 +279,35 @@ function MicroscopyViewer(props) {
     function calculateRadius(coord1, coord2) {
         return Math.sqrt(Math.pow(coord1[0] - coord2[0], 2) + Math.pow(coord1[1] - coord2[1], 2));
     }
+    function createRectangle(center, width, height, rotation = 0) {
+        let halfWidth = width / 2;
+        let halfHeight = height / 2;
+        let cosRotation = Math.cos(rotation);
+        let sinRotation = Math.sin(rotation);
+
+        let topLeft = [
+            center[0] - halfWidth * cosRotation - halfHeight * sinRotation,
+            center[1] - halfWidth * sinRotation + halfHeight * cosRotation
+        ];
+
+        let topRight = [
+            center[0] + halfWidth * cosRotation - halfHeight * sinRotation,
+            center[1] + halfWidth * sinRotation + halfHeight * cosRotation
+        ];
+
+        let bottomRight = [
+            center[0] + halfWidth * cosRotation + halfHeight * sinRotation,
+            center[1] + halfWidth * sinRotation - halfHeight * cosRotation
+        ];
+
+        let bottomLeft = [
+            center[0] - halfWidth * cosRotation + halfHeight * sinRotation,
+            center[1] - halfWidth * sinRotation - halfHeight * cosRotation
+        ];
+
+        return [topLeft, topRight, bottomRight, bottomLeft, topLeft]; // 確保長方形閉合
+    }
+
 
     const saveAnnotations = () => {
         // 获取所有手动添加的标记
@@ -268,7 +362,7 @@ function MicroscopyViewer(props) {
                     <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 " onClick={() => updateDrawType('Point')}><Icon icon="tabler:point-filled" className=""/></button>
                     <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('LineString')}><Icon icon="material-symbols-light:polyline-outline" className=""/></button>
                     <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Polygon')}><Icon icon="ph:polygon" className=""/></button>
-                    <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Circle')}><Icon icon="f7:rectangle" className="" /></button>
+                    <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Rectangle')}><Icon icon="f7:rectangle" className="" /></button>
                     <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Ellipse')}><Icon icon="mdi:ellipse-outline" className=""/></button>
                 </div>
                 <div className="text-center">
