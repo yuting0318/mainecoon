@@ -65,7 +65,7 @@ function microscopyViewer(props) {
 
                 const currentInstance = Instances[z]; // 當前的 Instance
                 const currentInstanceMetadata = _.get(currentInstance, "metadata"); // 當前 Instance 的 Metadata
-
+                console.log("currentInstanceMetadata", currentInstanceMetadata);
                 const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value"));
                 // 00480006 總寬 TotalPixelMatrixColumns
                 const currentInstanceSingleImageWidth = _.first(_.get(_.get(currentInstanceMetadata, "00280011"), "Value")); // 每張小圖的寬
@@ -167,7 +167,7 @@ function microscopyViewer(props) {
 
 
     return <>
-        <div className="w-96 h-100" id={viewerID}>
+        <div className="w-100 h-100" id={viewerID}>
         </div>
     </>
 }

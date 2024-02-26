@@ -36,10 +36,8 @@ const WSIViewer: React.FunctionComponent = () => {
         const metadata: object = _.first(seriesResult.metadata);
         const modalityAttribute: string = _.first(_.get(_.get(metadata, "00080060"), "Value")); //00080060
         return _.isEqual(modalityAttribute, "SM");
-        console.log("***********************************smSeriesResult", smSeriesResult);
     }));
 
-    console.log('+++++++++++++++++++seriesResults', seriesResults)
 
     // 監聽 pyramidSlice 
     const pyramidSliceReducer = useAppSelector((state) => state.pyramidSliceReducer);

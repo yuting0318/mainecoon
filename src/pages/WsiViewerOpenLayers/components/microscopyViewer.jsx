@@ -39,8 +39,8 @@ function MicroscopyViewer(props) {
     const savedRectangleSourceRef = useRef(new VectorSource({wrapX: false}));
     const drawInteractionRef = useRef(null);
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [isRightOpen, setIsRightOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
+    const [isRightOpen, setIsRightOpen] = useState(true);
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
     };
@@ -369,73 +369,103 @@ function MicroscopyViewer(props) {
 
             )}
 
-            <div className="w-100 h-100 flex text-center items-center" id={viewerID}></div>
+            <div className="w-100 h-100 flex text-center" id={viewerID}></div>
             {isRightOpen ? (
                 <div className="flex flex-row w-96">
-                <div className="flex flex-column w-full border-start">
-                    <div className="bg-opacity-100 flex justify-start items-end mt-2">
-                        <button
-                            className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"
-                            onClick={RightDrawer}>
-                            {'>>'}
-                        </button>
-                    </div>
-                    <div className="mt-2">
-                        <label className="ml-2 text-2xl ">SlideLabel</label>
-                    </div>
-                    <div className="bg-[#e8e8e8] mt-2">
-                        <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
-                        <p className="block ml-2 text-xl">BarcodeValue:</p>
-                    </div>
-                    <div>
-                        <label className="ml-2 text-2xl">Specimens</label>
-                    </div>
-                    <div className="bg-[#e8e8e8] mt-2 text-xl ">
-                        <p className="ml-2">AnatomicStructure:</p>
-                    </div>
+                    <div className="flex flex-column w-full border-start">
+                        <div className="bg-opacity-100 flex justify-start items-end mt-2">
+                            <button
+                                className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"
+                                onClick={RightDrawer}>
+                                {'>>'}
+                            </button>
+                        </div>
+                        <div className="mt-2">
+                            <label className="ml-2 text-2xl ">SlideLabel</label>
+                        </div>
+                        <div className="bg-[#e8e8e8] mt-2">
+                            <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
+                            <p className="block ml-2 text-xl">BarcodeValue:</p>
+                        </div>
+                        <div>
+                            <label className="ml-2 text-2xl">Specimens</label>
+                        </div>
+                        <div className="bg-[#e8e8e8] mt-2 text-xl ">
+                            <p className="ml-2">AnatomicStructure:</p>
+                        </div>
 
-                    <div className="text-center">
-                        <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>
-                        <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 " onClick={() => updateDrawType('Point')}>
-                            <Icon icon="tabler:point-filled" className=""/></button>
-                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                onClick={() => updateDrawType('LineString')}>
-                            <Icon icon="material-symbols-light:polyline-outline" className=""/></button>
-                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Polygon')}>
-                            <Icon icon="ph:polygon" className=""/></button>
-                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                onClick={() => updateDrawType('Rectangle')}>
-                            <Icon icon="f7:rectangle" className=""/></button>
-                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Ellipse')}>
-                            <Icon icon="mdi:ellipse-outline" className=""/></button>
-                    </div>
-                    <div className="text-center">
-                        <button className="bg-gray-300 rounded-lg p-2.5 mt-2" onClick={() => updateDrawType('Ellipse')}>
-                            <Icon icon="bx:screenshot" className=""/></button>
-                    </div>
+                        <div className="text-center">
+                            <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>
+                            <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 "
+                                    onClick={() => updateDrawType('Point')}>
+                                <Icon icon="tabler:point-filled" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('LineString')}>
+                                <Icon icon="material-symbols-light:polyline-outline" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Polygon')}>
+                                <Icon icon="ph:polygon" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Rectangle')}>
+                                <Icon icon="f7:rectangle" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Ellipse')}>
+                                <Icon icon="mdi:ellipse-outline" className=""/></button>
+                        </div>
+                        <div className="text-center">
+                            <button className="bg-gray-300 rounded-lg p-2.5 mt-2"
+                                    onClick={() => updateDrawType('Ellipse')}>
+                                <Icon icon="bx:screenshot" className=""/></button>
+                        </div>
 
-                    <div className="text-center mt-3">
-                        <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>
-                        <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"
-                                onClick={() => updateDrawType('Point')}>啟動
-                        </button>
-                        <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"
-                                onClick={() => updateDrawType('LineString')}>關閉
-                        </button>
-                        <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存
-                        </button>
-                    </div>
+                        <div className="text-center mt-3">
+                            <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>
+                            <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"
+                                    onClick={() => updateDrawType('Point')}>啟動
+                            </button>
+                            <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"
+                                    onClick={() => updateDrawType('LineString')}>關閉
+                            </button>
+                            <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存
+                            </button>
+                        </div>
 
-                </div>
+                    </div>
                 </div>
             ) : (
-                <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
-                    <button
-                        className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"
-                        onClick={RightDrawer}>
-                        {'<'}
-                    </button>
-                </div>
+                <>
+                    <div className="bg-opacity-0 flex flex-column justify-start items-end mt-80 ">
+                        <div className="bg-opacity-0 flex">
+                            <button
+                                className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"
+                                onClick={RightDrawer}>
+                                {'<'}
+                            </button>
+                        </div>
+                        <div className="flex flex-column mt-36 gap-2">
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
+                                    onClick={() => updateDrawType('Point')}>
+                                <Icon icon="tabler:point-filled" className=""/>
+                            </button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('LineString')}>
+                                <Icon icon="material-symbols-light:polyline-outline" className=""/>
+                            </button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Polygon')}>
+                                <Icon icon="ph:polygon" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Rectangle')}>
+                                <Icon icon="f7:rectangle" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Ellipse')}>
+                                <Icon icon="mdi:ellipse-outline" className=""/></button>
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                    onClick={() => updateDrawType('Ellipse')}>
+                                <Icon icon="bx:screenshot" className=""/></button>
+                        </div>
+                    </div>
+                </>
             )}
 
         </>
