@@ -29,7 +29,7 @@ const QueryParameter_PatientID: React.FC = () => {
                     tempQidorsParameter.PatientID = _.isEmpty(e.target.value) ? undefined : e.target.value;
                     queryParameterHandler(tempQidorsParameter);
                 }} />
-            <button className="border-2 m-2 rounded-lg px-2" onClick={searchBtnOnClick}>Search</button>
+            <button className="border-2 m-2 rounded-lg px-2 " onClick={searchBtnOnClick}>Search</button>
         </div>
     </>
 }

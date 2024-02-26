@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { useAppSelector, useAppDispatch } from "Hook";
+import React, {useEffect, useRef, useState} from 'react';
+import {useAppSelector} from "Hook";
 import _ from "lodash";
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
@@ -9,16 +8,13 @@ import Map from "ol/Map";
 import View from "ol/View";
 import LayerTile from "ol/layer/Tile";
 import XYZ from 'ol/source/XYZ';
-import { Draw } from 'ol/interaction';
+import {Draw} from 'ol/interaction';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { Projection } from 'ol/proj';
+import {Projection} from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
-import { createStringXY } from 'ol/coordinate';
-import { getCenter } from 'ol/extent';
-
-
-import dicomWebServerConfig from "Configs/DICOMWebServer.config";
+import {createStringXY} from 'ol/coordinate';
+import {getCenter} from 'ol/extent';
 
 function MicroscopyViewer(props) {
     const viewerID = "viewerID";
@@ -31,7 +27,7 @@ function MicroscopyViewer(props) {
 
     const [drawType, setDrawType] = useState('Point');
     const mapRef = useRef(null);
-    const sourceRef = useRef(new VectorSource({ wrapX: false }));
+    const sourceRef = useRef(new VectorSource({wrapX: false}));
     const [isDrawingEllipse, setIsDrawingEllipse] = useState(false);
     const [ellipseCenter, setEllipseCenter] = useState(null);
     const [ellipsePreview, setEllipsePreview] = useState(null);
@@ -39,9 +35,19 @@ function MicroscopyViewer(props) {
     const [rectangleCenter, setRectangleCenter] = useState(null);
     const [rectanglePreview, setRectanglePreview] = useState(null);
 
-    const savedEllipsesSourceRef = useRef(new VectorSource({ wrapX: false }));
-    const savedRectangleSourceRef = useRef(new VectorSource({ wrapX: false }));
+    const savedEllipsesSourceRef = useRef(new VectorSource({wrapX: false}));
+    const savedRectangleSourceRef = useRef(new VectorSource({wrapX: false}));
     const drawInteractionRef = useRef(null);
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [isRightOpen, setIsRightOpen] = useState(false);
+    const LeftDrawer = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const RightDrawer = () => {
+        setIsRightOpen(!isRightOpen);
+    };
 
     useEffect(() => {
         const minLevel = 0;
@@ -92,7 +98,7 @@ function MicroscopyViewer(props) {
         const savedRectangleLayer = new VectorLayer({
             source: savedRectangleSourceRef.current,
         });
-        const wsiLayer = new LayerTile({ source: wsiSourceXYZ, extent: extent });
+        const wsiLayer = new LayerTile({source: wsiSourceXYZ, extent: extent});
 
         const view = new View({
             center: getCenter(extent),
@@ -103,8 +109,8 @@ function MicroscopyViewer(props) {
             extent: extent,
         });
 
-        const vector = new VectorLayer({ source: sourceRef.current });
-        const layers = [wsiLayer, ...annVectorLayers, vector, savedEllipsesLayer,savedRectangleLayer];
+        const vector = new VectorLayer({source: sourceRef.current});
+        const layers = [wsiLayer, ...annVectorLayers, vector, savedEllipsesLayer, savedRectangleLayer];
         const mousePositionControl = new MousePosition({
             coordinateFormat: createStringXY(0),
             projection: 'EPSG:4326',
@@ -160,7 +166,6 @@ function MicroscopyViewer(props) {
         }
 
 
-
         if (!isDrawingEllipse && ellipsePreview) {
             savedEllipsesSourceRef.current.addFeature(new Feature(ellipsePreview.getGeometry())); // 將橢圓添加到保存圖層
             ellipsePreview.setGeometry(null); // 清除預覽圖層中的橢圓
@@ -207,12 +212,13 @@ function MicroscopyViewer(props) {
                 sourceRef.current.removeFeature(newRectanglePreview);
             };
         }
-    if (!isDrawingRectangle && rectanglePreview) {
-        savedRectangleSourceRef.current.addFeature(new Feature(rectanglePreview.getGeometry())); // 將橢圓添加到保存圖層
-        rectanglePreview.setGeometry(null); // 清除預覽圖層中的橢圓
-        sourceRef.current.removeFeature(rectanglePreview); // 從原來的圖層中移除
-        setRectanglePreview(null); // 重置預覽Feature
-    }}, [isDrawingRectangle, rectangleCenter]);
+        if (!isDrawingRectangle && rectanglePreview) {
+            savedRectangleSourceRef.current.addFeature(new Feature(rectanglePreview.getGeometry())); // 將橢圓添加到保存圖層
+            rectanglePreview.setGeometry(null); // 清除預覽圖層中的橢圓
+            sourceRef.current.removeFeature(rectanglePreview); // 從原來的圖層中移除
+            setRectanglePreview(null); // 重置預覽Feature
+        }
+    }, [isDrawingRectangle, rectangleCenter]);
 
     const updateDrawType = (type) => {
         // 如果当前正在绘制椭圆，则处理椭圆的结束逻辑
@@ -224,7 +230,7 @@ function MicroscopyViewer(props) {
                 setEllipsePreview(null);
             }
             setEllipseCenter(null);
-        }else if(isDrawingRectangle){
+        } else if (isDrawingRectangle) {
             setIsDrawingRectangle(false);
             if (rectanglePreview) {
                 rectanglePreview.setGeometry(null);
@@ -243,11 +249,9 @@ function MicroscopyViewer(props) {
         // 对于椭圆，设置相关状态以启用特殊的椭圆绘图逻辑
         if (type === 'Ellipse') {
             setIsDrawingEllipse(true);
-            console.log("我再畫元形")
-        }else if (type === 'Rectangle') {
+        } else if (type === 'Rectangle') {
             setIsDrawingRectangle(true);
-            console.log("我再畫長方形")
-        }else {
+        } else {
             // 为其他绘图类型创建 Draw 交互
             const drawInteraction = new Draw({
                 source: sourceRef.current,
@@ -279,6 +283,7 @@ function MicroscopyViewer(props) {
     function calculateRadius(coord1, coord2) {
         return Math.sqrt(Math.pow(coord1[0] - coord2[0], 2) + Math.pow(coord1[1] - coord2[1], 2));
     }
+
     function createRectangle(center, width, height, rotation = 0) {
         let halfWidth = width / 2;
         let halfHeight = height / 2;
@@ -321,64 +326,121 @@ function MicroscopyViewer(props) {
 
     return (
         <>
-            <div className="flex flex-column w-25 border-end">
-                <div>
-                    <label className="ml-2 text-2xl">Patient</label>
-                </div>
-                <div className="bg-[#e8e8e8] mt-2">
-                    <label className="block ml-2 text-xl">ID:</label>
-                    <label className="block ml-2 text-xl">Name:</label>
-                    <label className="block ml-2 text-xl">Gender:</label>
-                    <label className="block ml-2 text-xl">Birthday:</label>
-                </div>
-                <div>
-                    <label className="ml-2 text-2xl mt-2">Case</label>
-                </div>
-                <div className="bg-[#e8e8e8] mt-2">
-                    <label className="block ml-2 text-xl">Accession:</label>
-                    <label className="block ml-2 text-xl">ID:</label>
-                    <label className="block ml-2 text-xl">Date:</label>
-                    <label className="block ml-2 text-xl">Time:</label>
-                </div>
-            </div>
-            <div className="w-100 h-100" id={viewerID}></div>
-            <div className="flex flex-column w-25 border-start">
-                <div>
-                    <label className="ml-2 text-2xl">SlideLabel</label>
-                </div>
-                <div className="bg-[#e8e8e8] mt-2">
-                    <label className="block ml-2 text-xl">LabelText</label>
-                    <p className="block ml-2 text-xl">BarcodeValue:</p>
-                </div>
-                <div>
-                    <label className="ml-2 text-2xl">Specimens</label>
-                </div>
-                <div className="bg-[#e8e8e8] mt-2 text-xl ">
-                    <p className="ml-2">AnatomicStructure:</p>
-                </div>
-
-                <div className="text-center">
-                    <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>
-                    <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 " onClick={() => updateDrawType('Point')}><Icon icon="tabler:point-filled" className=""/></button>
-                    <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('LineString')}><Icon icon="material-symbols-light:polyline-outline" className=""/></button>
-                    <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Polygon')}><Icon icon="ph:polygon" className=""/></button>
-                    <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Rectangle')}><Icon icon="f7:rectangle" className="" /></button>
-                    <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Ellipse')}><Icon icon="mdi:ellipse-outline" className=""/></button>
-                </div>
-                <div className="text-center">
-                    <button className="bg-gray-300 rounded-lg p-2.5 mt-2" onClick={() => updateDrawType('Ellipse')}><Icon icon="bx:screenshot" className=""/></button>
+            {isOpen ? (
+                <>
+                    <div className="flex flex-row w-96">
+                        <div className={`flex flex-column w-full border-end`}>
+                            <div className="bg-opacity-100 flex justify-end items-end z-30 mt-2">
+                                <button
+                                    className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg p-3"
+                                    onClick={LeftDrawer}>
+                                    {'<<'}
+                                </button>
+                            </div>
+                            <div>
+                                <label className="ml-2 text-2xl">Patient</label>
+                            </div>
+                            <div className="bg-[#e8e8e8] mt-2">
+                                <label className="block ml-2 text-xl">ID:</label>
+                                <label className="block ml-2 text-xl">Name:</label>
+                                <label className="block ml-2 text-xl">Gender:</label>
+                                <label className="block ml-2 text-xl">Birthday:</label>
+                            </div>
+                            <div>
+                                <label className="ml-2 text-2xl mt-2">Case</label>
+                            </div>
+                            <div className="bg-[#e8e8e8] mt-2">
+                                <label className="block ml-2 text-xl">Accession:</label>
+                                <label className="block ml-2 text-xl">ID:</label>
+                                <label className="block ml-2 text-xl">Date:</label>
+                                <label className="block ml-2 text-xl">Time:</label>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
+                    <button
+                        className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg px-2 py-5"
+                        onClick={LeftDrawer}>
+                        {'>'}
+                    </button>
                 </div>
 
-                <div className="text-center mt-3">
-                    <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>
-                    <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3" onClick={() => updateDrawType('Point')}>啟動</button>
-                    <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3" onClick={() => updateDrawType('LineString')}>關閉</button>
-                    <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存</button>
-                </div>
+            )}
 
-            </div>
+            <div className="w-100 h-100 flex text-center items-center" id={viewerID}></div>
+            {isRightOpen ? (
+                <div className="flex flex-row w-96">
+                <div className="flex flex-column w-full border-start">
+                    <div className="bg-opacity-100 flex justify-start items-end mt-2">
+                        <button
+                            className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"
+                            onClick={RightDrawer}>
+                            {'>>'}
+                        </button>
+                    </div>
+                    <div className="mt-2">
+                        <label className="ml-2 text-2xl ">SlideLabel</label>
+                    </div>
+                    <div className="bg-[#e8e8e8] mt-2">
+                        <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
+                        <p className="block ml-2 text-xl">BarcodeValue:</p>
+                    </div>
+                    <div>
+                        <label className="ml-2 text-2xl">Specimens</label>
+                    </div>
+                    <div className="bg-[#e8e8e8] mt-2 text-xl ">
+                        <p className="ml-2">AnatomicStructure:</p>
+                    </div>
+
+                    <div className="text-center">
+                        <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>
+                        <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 " onClick={() => updateDrawType('Point')}>
+                            <Icon icon="tabler:point-filled" className=""/></button>
+                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                onClick={() => updateDrawType('LineString')}>
+                            <Icon icon="material-symbols-light:polyline-outline" className=""/></button>
+                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Polygon')}>
+                            <Icon icon="ph:polygon" className=""/></button>
+                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                                onClick={() => updateDrawType('Rectangle')}>
+                            <Icon icon="f7:rectangle" className=""/></button>
+                        <button className="bg-gray-300 rounded-lg p-2.5 mr-2" onClick={() => updateDrawType('Ellipse')}>
+                            <Icon icon="mdi:ellipse-outline" className=""/></button>
+                    </div>
+                    <div className="text-center">
+                        <button className="bg-gray-300 rounded-lg p-2.5 mt-2" onClick={() => updateDrawType('Ellipse')}>
+                            <Icon icon="bx:screenshot" className=""/></button>
+                    </div>
+
+                    <div className="text-center mt-3">
+                        <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>
+                        <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"
+                                onClick={() => updateDrawType('Point')}>啟動
+                        </button>
+                        <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"
+                                onClick={() => updateDrawType('LineString')}>關閉
+                        </button>
+                        <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存
+                        </button>
+                    </div>
+
+                </div>
+                </div>
+            ) : (
+                <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
+                    <button
+                        className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"
+                        onClick={RightDrawer}>
+                        {'<'}
+                    </button>
+                </div>
+            )}
+
         </>
-    );
+    )
+        ;
 }
 
 export default MicroscopyViewer;

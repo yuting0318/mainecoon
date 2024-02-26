@@ -7,7 +7,7 @@ const Header: React.FC = () => {
         <div className="m-0 p-0">
             <div className=" text-white bg-green-500 p-3">
                 <div className="container-fluid">
-                    <Link className=" text-white" to="/">MaineCoonViewer</Link>
+                    <Link className=" text-white " to="/">MaineCoonViewer</Link>
                 </div>
             </div>
         </div>

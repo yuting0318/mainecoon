@@ -66,7 +66,8 @@ function microscopyViewer(props) {
                 const currentInstance = Instances[z]; // 當前的 Instance
                 const currentInstanceMetadata = _.get(currentInstance, "metadata"); // 當前 Instance 的 Metadata
 
-                const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value")); // 00480006 總寬 TotalPixelMatrixColumns 
+                const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value"));
+                // 00480006 總寬 TotalPixelMatrixColumns
                 const currentInstanceSingleImageWidth = _.first(_.get(_.get(currentInstanceMetadata, "00280011"), "Value")); // 每張小圖的寬
                 const widthImageCount = Math.ceil(currentInstanceTotalPixelMatrixColumns / currentInstanceSingleImageWidth); // 寬度部分要擺多少張
                 const index = x + y * widthImageCount // 計算 Index
@@ -128,7 +129,6 @@ function microscopyViewer(props) {
             smoothExtentConstraint: false,
             projection: dicomProjection,
             extent: extent,
-            smoothExtentConstraint: false,
             showFullExtent: true,
         });
 
@@ -167,7 +167,7 @@ function microscopyViewer(props) {
 
 
     return <>
-        <div className="w-100 h-100" id={viewerID}>
+        <div className="w-96 h-100" id={viewerID}>
         </div>
     </>
 }

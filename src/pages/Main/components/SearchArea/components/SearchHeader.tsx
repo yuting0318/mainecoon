@@ -61,7 +61,7 @@ const SearchHeaderExpandMode: React.FC<SearchHeaderProps> = ({ onMouseHoverHandl
 const SearchHeaderLiteMode: React.FC = () => {
 
     return <>
-        <div className="bg-white border-bottom m-2">
+        <div className="bg-auto border-bottom m-2 ">
             <div className="container-fluid">
                 <div className="flex flex-fill flex-column">
                     <QueryParameter_PatientID />
