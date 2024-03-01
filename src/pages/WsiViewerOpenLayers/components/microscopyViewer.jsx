@@ -180,7 +180,6 @@ function MicroscopyViewer(props) {
             const newRectanglePreview = new Feature();
             setRectanglePreview(newRectanglePreview);
             sourceRef.current.addFeature(newRectanglePreview);
-
             const clickHandler = (event) => {
                 if (!rectangleCenter) {
                     setRectangleCenter(event.coordinate);
@@ -434,7 +433,7 @@ function MicroscopyViewer(props) {
                 </div>
             ) : (
                 <>
-                    <div className="bg-opacity-0 flex flex-column justify-start items-end mt-80 ">
+                    <div className="bg-opacity-0 flex flex-column justify-start items-end mt-60 gap-10">
                         <div className="bg-opacity-0 flex">
                             <button
                                 className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"
@@ -442,7 +441,7 @@ function MicroscopyViewer(props) {
                                 {'<'}
                             </button>
                         </div>
-                        <div className="flex flex-column mt-36 gap-2">
+                        <div className="flex flex-column mb-5 gap-2">
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
                                     onClick={() => updateDrawType('Point')}>
                                 <Icon icon="tabler:point-filled" className=""/>
@@ -457,7 +456,7 @@ function MicroscopyViewer(props) {
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
                                     onClick={() => updateDrawType('Rectangle')}>
                                 <Icon icon="f7:rectangle" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
+                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
                                     onClick={() => updateDrawType('Ellipse')}>
                                 <Icon icon="mdi:ellipse-outline" className=""/></button>
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2"

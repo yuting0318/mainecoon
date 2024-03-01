@@ -15,7 +15,8 @@ const ImageResultList: React.FC = () => {
     return (
         <>
             {!isLoading && (
-                <div className="flex flex-row">
+                <div className="flex flex-row gap-3">
+                {/*<div className="grid grid-row gap-3">*/}
                     {seriesResults?.map((seriesResult, index) => (
                         <ImageResult key={index} wadoSingleSeries={seriesResult} />
                     ))}

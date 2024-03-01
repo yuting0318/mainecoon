@@ -48,32 +48,40 @@ const ImageResult: React.FC<ImageResultProps> = ({
 
     return <>
         <div className="mt-4">
-            <div className="w-96 h-96 border-4 ml-4 mb-4" key="{seriesInstanceUID}" onClick={OnClick}>
+            <div className="w-60 h-60 ml-4 mb-4 border border-4" key="{seriesInstanceUID}" onClick={OnClick}>
                 {// 將SM和ANN的內容放在同一個div內
                     (_.isEqual(_.first(modalityAttribute), "SM") || _.isEqual(_.first(modalityAttribute), "ANN")) && (
-                        <div className="mb-4">
+                        <div className="">
                             {// ModalityAttribute 是 SM 則顯示圖片
                                 _.isEqual(_.first(modalityAttribute), "SM") && (
                                     <>
+                                        <div className="">
                                             <img
                                                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/MI_with_contraction_bands_very_high_mag.jpg/1920px-MI_with_contraction_bands_very_high_mag.jpg"
-                                                height={"380px"} width={"380px"}/>
-                                            <h5 className="text-green-500 mt-3 font-bold text-2xl ml-3">{modalityAttribute}</h5>
-                                            <p className="ml-3">最大圖片數量：{maxNumberOfFrames}張</p>
-                                            <p className="ml-3">擁有放大倍率：{seriesLevel}層</p>
+                                                height={"280px"} width={"380px"}/>
+                                            <div className="flex flex-col space-y-0 ">
+                                                <h5 className="text-green-500 font-bold ml-3 mt-1">{modalityAttribute}</h5>
+                                                <p className="ml-3 text-sm">最大圖片數量：{maxNumberOfFrames}張</p>
+                                                <p className="ml-3 text-sm">擁有放大倍率：{seriesLevel}層</p>
+                                            </div>
+
+                                        </div>
                                     </>
                                 )
                             }
                             {// ModalityAttribute 是 ANN 則顯示一支筆
                                 _.isEqual(_.first(modalityAttribute), "ANN") && (
                                     <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                             className="bi bi-3pencil-fill ml-20" viewBox="0 0 16 16" height={"230px"}
-                                             width={"210px"}>
-                                            <path
-                                                d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
-                                        </svg>
-                                        <h5 className="mt-12 font-bold text-green-500 text-2xl ml-3">{modalityAttribute}</h5>
+                                        <div className="">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                 className="bi bi-3pencil-fill ml-10" viewBox="0 0 16 16"
+                                                 height={"140px"} width={"130px"}
+                                            >
+                                                <path
+                                                    d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                                            </svg>
+                                            <h5 className="mt-3 font-bold text-green-500 text-lg ml-3">{modalityAttribute}</h5>
+                                        </div>
                                     </>
                                 )
                             }
