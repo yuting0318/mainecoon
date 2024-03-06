@@ -47,8 +47,8 @@ const ImageResult: React.FC<ImageResultProps> = ({
 
 
     return <>
-        <div className="mt-4">
-            <div className="w-60 h-60 ml-4 mb-4 border border-4" key="{seriesInstanceUID}" onClick={OnClick}>
+        <div className="mt-4 ">
+            <div className="w-52 h-52 mb-4 border border-4" key="{seriesInstanceUID}" onClick={OnClick}>
                 {// 將SM和ANN的內容放在同一個div內
                     (_.isEqual(_.first(modalityAttribute), "SM") || _.isEqual(_.first(modalityAttribute), "ANN")) && (
                         <div className="">
