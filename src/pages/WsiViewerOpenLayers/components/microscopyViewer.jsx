@@ -15,6 +15,10 @@ import {Projection} from 'ol/proj';
 import MousePosition from 'ol/control/MousePosition';
 import {createStringXY} from 'ol/coordinate';
 import {getCenter} from 'ol/extent';
+import Point from 'ol/geom/Point';
+import LineString from 'ol/geom/LineString';
+import Circle from 'ol/geom/Circle';
+
 
 function MicroscopyViewer(props) {
     const viewerID = "viewerID";
@@ -264,7 +268,7 @@ function MicroscopyViewer(props) {
         }
     };
 
-    function createEllipse(center, radiusX, radiusY, rotation = 0, sides = 50) {
+    function createEllipse1(center, radiusX, radiusY, rotation = 0, sides = 50) {
         let angleStep = (2 * Math.PI) / sides;
         let coords = [];
 
@@ -313,6 +317,30 @@ function MicroscopyViewer(props) {
     }
 
 
+    // Define formatCoordinate function
+    const formatCoordinate = (coord) => {
+        return `(${coord[0].toFixed(1)}, ${coord[1].toFixed(1)})`;
+    };
+
+
+
+    function createEllipse(center, semiMajor, semiMinor, rotation = 0, sides = 50) {
+        let angleStep = (2 * Math.PI) / sides;
+        let coords = [];
+
+        for (let i = 0; i < sides; i++) {
+            let angle = i * angleStep;
+            let x = center[0] + semiMajor * Math.cos(angle) * Math.cos(rotation) - semiMinor * Math.sin(angle) * Math.sin(rotation);
+            let y = center[1] + semiMajor * Math.cos(angle) * Math.sin(rotation) + semiMinor * Math.sin(angle) * Math.cos(rotation);
+            coords.push([x, y]);
+        }
+        coords.push(coords[0]); // Ensure the ellipse is closed
+
+        return coords;
+    }
+
+
+// Update the saveAnnotations function
     const saveAnnotations = () => {
         // 获取所有手动添加的标记
         const features = sourceRef.current.getFeatures();
@@ -335,27 +363,28 @@ function MicroscopyViewer(props) {
                 type = "POLYLINE";
                 coordinates = geometry.getCoordinates().map(coord => formatCoordinate(coord));
             }
-            if (geometry instanceof Rectangle) {
-                type = "RECTANGLE";
-                const extent = geometry.getExtent();
-                coordinates.push(formatCoordinate([extent[0], extent[1]])); // Bottom-left
-                coordinates.push(formatCoordinate([extent[2], extent[1]])); // Bottom-right
-                coordinates.push(formatCoordinate([extent[2], extent[3]])); // Top-right
-                coordinates.push(formatCoordinate([extent[0], extent[3]])); // Top-left
-            }
-            if (geometry instanceof Circle) {
-                type = "ELLIPSE";
-                const center = geometry.getCenter();
-                const radiusX = geometry.getRadiusX();
-                const radiusY = geometry.getRadiusY();
-                coordinates = createEllipse(center, radiusX, radiusY).map(coord => formatCoordinate(coord));
-            }
+            // if (geometry instanceof Rectangle) {
+            //     type = "RECTANGLE";
+            //     const extent = geometry.getExtent();
+            //     coordinates.push(formatCoordinate([extent[0], extent[1]])); // Bottom-left
+            //     coordinates.push(formatCoordinate([extent[2], extent[1]])); // Bottom-right
+            //     coordinates.push(formatCoordinate([extent[2], extent[3]])); // Top-right
+            //     coordinates.push(formatCoordinate([extent[0], extent[3]])); // Top-left
+            // }
+            // if (geometry instanceof ELLIPSE) {
+            //     type = "ELLIPSE";
+            //     const center = geometry.getCenter();
+            //     const radiusX = geometry.getRadiusX();
+            //     const radiusY = geometry.getRadiusY();
+            //     coordinates = createEllipse(center, radiusX, radiusY).map(coord => formatCoordinate(coord));
+            // }
 
             return { type, coordinates };
         });
         // 输出到控制台
         console.log('Saved Annotations:', savedAnnotations);
     };
+
 
 
 
