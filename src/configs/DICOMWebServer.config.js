@@ -1,16 +1,16 @@
 module.exports = {
     QIDO: {
-        enableHTTPS: false,
-        hostname: "140.131.93.145",
+        enableHTTPS: true,
+        hostname: "ditto.dicom.tw",
         // hostname:"",
-        port: "8081",
+        port: "",
         pathname: "/dicom-web",
         Token: null
     },
     WADO: {
-        enableHTTPS: false,
-        hostname: "140.131.93.145",
-        port: "8081",
+        enableHTTPS: true,
+        hostname: "ditto.dicom.tw",
+        port: "",
         URI_pathname: "/dicom-web/wado",
         RS_pathname: "/dicom-web",
         Mode: "rs",

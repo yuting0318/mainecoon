@@ -317,10 +317,47 @@ function MicroscopyViewer(props) {
         // 获取所有手动添加的标记
         const features = sourceRef.current.getFeatures();
         // 转换为JSON格式
-        const savedFeatures = features.map(feature => feature.getProperties());
+        const savedAnnotations = features.map(feature => {
+            let type;
+            let coordinates = [];
+
+            // 获取几何类型和坐标
+            const geometry = feature.getGeometry();
+            if (geometry instanceof Point) {
+                type = "POINT";
+                coordinates.push(formatCoordinate(geometry.getCoordinates()));
+            }
+            if (geometry instanceof Polygon) {
+                type = "POLYGON";
+                coordinates = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
+            }
+            if (geometry instanceof LineString) {
+                type = "POLYLINE";
+                coordinates = geometry.getCoordinates().map(coord => formatCoordinate(coord));
+            }
+            if (geometry instanceof Rectangle) {
+                type = "RECTANGLE";
+                const extent = geometry.getExtent();
+                coordinates.push(formatCoordinate([extent[0], extent[1]])); // Bottom-left
+                coordinates.push(formatCoordinate([extent[2], extent[1]])); // Bottom-right
+                coordinates.push(formatCoordinate([extent[2], extent[3]])); // Top-right
+                coordinates.push(formatCoordinate([extent[0], extent[3]])); // Top-left
+            }
+            if (geometry instanceof Circle) {
+                type = "ELLIPSE";
+                const center = geometry.getCenter();
+                const radiusX = geometry.getRadiusX();
+                const radiusY = geometry.getRadiusY();
+                coordinates = createEllipse(center, radiusX, radiusY).map(coord => formatCoordinate(coord));
+            }
+
+            return { type, coordinates };
+        });
         // 输出到控制台
-        console.log('Saved Annotations:', JSON.stringify(savedFeatures));
+        console.log('Saved Annotations:', savedAnnotations);
     };
+
+
 
 
     return (
@@ -443,24 +480,24 @@ function MicroscopyViewer(props) {
                         </div>
                         <div className="flex flex-column mb-5 gap-2">
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
-                                    onClick={() => updateDrawType('Point')}>
+                                    onClick={() => updateDrawType('POINT')}>
                                 <Icon icon="tabler:point-filled" className=""/>
                             </button>
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('LineString')}>
+                                    onClick={() => updateDrawType('POLYLINE')}>
                                 <Icon icon="material-symbols-light:polyline-outline" className=""/>
                             </button>
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('Polygon')}>
+                                    onClick={() => updateDrawType('POLYGON')}>
                                 <Icon icon="ph:polygon" className=""/></button>
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('Rectangle')}>
+                                    onClick={() => updateDrawType('RECTANGLE')}>
                                 <Icon icon="f7:rectangle" className=""/></button>
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
-                                    onClick={() => updateDrawType('Ellipse')}>
+                                    onClick={() => updateDrawType('ELLIPSE')}>
                                 <Icon icon="mdi:ellipse-outline" className=""/></button>
                             <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('Ellipse')}>
+                                    onClick={() => updateDrawType('ELLIPSE')}>
                                 <Icon icon="bx:screenshot" className=""/></button>
                         </div>
                     </div>

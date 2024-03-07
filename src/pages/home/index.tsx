@@ -11,5 +11,4 @@ const Home: React.FC = () => {
         <Link to="/newMain">NewMain</Link>
     </>
 };
-
 export default Home;
