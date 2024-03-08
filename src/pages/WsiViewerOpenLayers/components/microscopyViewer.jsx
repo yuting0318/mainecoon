@@ -339,8 +339,6 @@ function MicroscopyViewer(props) {
         return coords;
     }
 
-
-// Update the saveAnnotations function
     const saveAnnotations = () => {
         // 获取所有手动添加的标记
         const features = sourceRef.current.getFeatures();
@@ -354,36 +352,34 @@ function MicroscopyViewer(props) {
             if (geometry instanceof Point) {
                 type = "POINT";
                 coordinates.push(formatCoordinate(geometry.getCoordinates()));
-            }
-            if (geometry instanceof Polygon) {
+            } else if (geometry instanceof Polygon) {
                 type = "POLYGON";
                 coordinates = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
-            }
-            if (geometry instanceof LineString) {
+            } else if (geometry instanceof LineString) {
                 type = "POLYLINE";
                 coordinates = geometry.getCoordinates().map(coord => formatCoordinate(coord));
             }
-            // if (geometry instanceof Rectangle) {
-            //     type = "RECTANGLE";
-            //     const extent = geometry.getExtent();
-            //     coordinates.push(formatCoordinate([extent[0], extent[1]])); // Bottom-left
-            //     coordinates.push(formatCoordinate([extent[2], extent[1]])); // Bottom-right
-            //     coordinates.push(formatCoordinate([extent[2], extent[3]])); // Top-right
-            //     coordinates.push(formatCoordinate([extent[0], extent[3]])); // Top-left
-            // }
-            // if (geometry instanceof ELLIPSE) {
-            //     type = "ELLIPSE";
-            //     const center = geometry.getCenter();
-            //     const radiusX = geometry.getRadiusX();
-            //     const radiusY = geometry.getRadiusY();
-            //     coordinates = createEllipse(center, radiusX, radiusY).map(coord => formatCoordinate(coord));
-            // }
 
             return { type, coordinates };
         });
+
+        // 将每个类型的标记组成一个对象
+        const groupedAnnotations = Object.values(savedAnnotations.reduce((acc, curr) => {
+            if (acc[curr.type]) {
+                acc[curr.type].coordinates = acc[curr.type].coordinates.concat(curr.coordinates);
+            } else {
+                acc[curr.type] = { type: curr.type, coordinates: curr.coordinates };
+            }
+            return acc;
+        }, {}));
+
         // 输出到控制台
-        console.log('Saved Annotations:', savedAnnotations);
+        console.log('Grouped Annotations:', groupedAnnotations);
     };
+
+
+
+
 
 
 
