@@ -19,6 +19,56 @@ import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import Circle from 'ol/geom/Circle';
 
+function getEllipseCoordinates(coordinates) {
+    const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
+
+    const distance = (point1, point2) => Math.hypot(point2[0] - point1[0], point2[1] - point1[1]);
+
+    // Find the two farthest points for the major axis
+    let maxDistance = 0;
+    let majorAxisPoints = [];
+    points.forEach((point1, index1) => {
+        points.forEach((point2, index2) => {
+            if (index1 !== index2) {
+                const dist = distance(point1, point2);
+                if (dist > maxDistance) {
+                    maxDistance = dist;
+                    majorAxisPoints = [point1, point2];
+                }
+            }
+        });
+    });
+
+    // Calculate the midpoint of the major axis
+    const midpoint = [
+        (majorAxisPoints[0][0] + majorAxisPoints[1][0]) / 2,
+        (majorAxisPoints[0][1] + majorAxisPoints[1][1]) / 2,
+    ];
+
+    // Calculate the angle of the major axis relative to the x-axis
+    const angle = Math.atan2(majorAxisPoints[1][1] - majorAxisPoints[0][1], majorAxisPoints[1][0] - majorAxisPoints[0][0]);
+
+    // Find the minor axis points
+    let minorAxisPoints = [];
+    let maxMinorDist = 0;
+    points.forEach((point) => {
+        // Project point onto the line perpendicular to the major axis and going through the midpoint
+        const projectedX = midpoint[0] + Math.sin(angle) * (point[1] - midpoint[1]) + Math.cos(angle) * (point[0] - midpoint[0]);
+        const projectedY = midpoint[1] - Math.cos(angle) * (point[1] - midpoint[1]) + Math.sin(angle) * (point[0] - midpoint[0]);
+        const projectedDist = distance(midpoint, [projectedX, projectedY]);
+
+        // Update minor axis points if a longer distance is found
+        if (projectedDist > maxMinorDist) {
+            maxMinorDist = projectedDist;
+            minorAxisPoints = [
+                [midpoint[0] - Math.sin(angle) * projectedDist, midpoint[1] + Math.cos(angle) * projectedDist],
+                [midpoint[0] + Math.sin(angle) * projectedDist, midpoint[1] - Math.cos(angle) * projectedDist],
+            ];
+        }
+    });
+
+    return [...majorAxisPoints, ...minorAxisPoints].map(point => `(${point[0]}, ${point[1]})`);
+}
 
 function MicroscopyViewer(props) {
     const viewerID = "viewerID";
@@ -313,7 +363,7 @@ function MicroscopyViewer(props) {
             center[1] - halfWidth * sinRotation - halfHeight * cosRotation
         ];
 
-        return [topLeft, topRight, bottomRight, bottomLeft, topLeft]; // 確保長方形閉合
+        return [topLeft, topRight, bottomRight, bottomLeft]; // 確保長方形閉合
     }
 
 
@@ -342,10 +392,27 @@ function MicroscopyViewer(props) {
     const saveAnnotations = () => {
         // 获取所有手动添加的标记
         const features = sourceRef.current.getFeatures();
+
+        function CustomShape(type, feature) {
+            this.type = type;
+            this.feature = feature;
+        }
+
+        const rectanglesFeatures = savedRectangleSourceRef.current.getFeatures();
+        features.push(...rectanglesFeatures.map(feature => new CustomShape('RECTANGLE', feature)));
+
+        const ellipsesFeatures = savedEllipsesSourceRef.current.getFeatures();
+        features.push(...ellipsesFeatures.map(feature => new CustomShape('ELLIPSE', feature)));
+
         // 转换为JSON格式
         const savedAnnotations = features.map(feature => {
-            let type;
+            let type = null;
             let coordinates = [];
+
+            if (feature instanceof CustomShape) {
+                type = feature.type;
+                feature = feature.feature;
+            }
 
             // 获取几何类型和坐标
             const geometry = feature.getGeometry();
@@ -353,8 +420,11 @@ function MicroscopyViewer(props) {
                 type = "POINT";
                 coordinates.push(formatCoordinate(geometry.getCoordinates()));
             } else if (geometry instanceof Polygon) {
-                type = "POLYGON";
+                type ??= "POLYGON";
                 coordinates = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
+                if (type === 'ELLIPSE') {
+                    coordinates = getEllipseCoordinates(coordinates);
+                }
             } else if (geometry instanceof LineString) {
                 type = "POLYLINE";
                 coordinates = geometry.getCoordinates().map(coord => formatCoordinate(coord));
