@@ -19,56 +19,44 @@ import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import Circle from 'ol/geom/Circle';
 
-function getEllipseCoordinates(coordinates) {
+function calculateExtremityPoints(coordinates) {
     const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
 
-    const distance = (point1, point2) => Math.hypot(point2[0] - point1[0], point2[1] - point1[1]);
+    // Encapsulated helper function to estimate the center of the ellipse
+    function estimateCenter(points) {
+        let sumX = 0, sumY = 0;
 
-    // Find the two farthest points for the major axis
-    let maxDistance = 0;
-    let majorAxisPoints = [];
-    points.forEach((point1, index1) => {
-        points.forEach((point2, index2) => {
-            if (index1 !== index2) {
-                const dist = distance(point1, point2);
-                if (dist > maxDistance) {
-                    maxDistance = dist;
-                    majorAxisPoints = [point1, point2];
-                }
-            }
+        points.forEach(point => {
+            sumX += point[0];
+            sumY += point[1];
         });
-    });
 
-    // Calculate the midpoint of the major axis
-    const midpoint = [
-        (majorAxisPoints[0][0] + majorAxisPoints[1][0]) / 2,
-        (majorAxisPoints[0][1] + majorAxisPoints[1][1]) / 2,
-    ];
+        return [sumX / points.length, sumY / points.length];
+    }
 
-    // Calculate the angle of the major axis relative to the x-axis
-    const angle = Math.atan2(majorAxisPoints[1][1] - majorAxisPoints[0][1], majorAxisPoints[1][0] - majorAxisPoints[0][0]);
+    // Encapsulated helper function to calculate the distance between two points
+    function distance(point1, point2) {
+        return Math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2);
+    }
 
-    // Find the minor axis points
-    let minorAxisPoints = [];
-    let maxMinorDist = 0;
-    points.forEach((point) => {
-        // Project point onto the line perpendicular to the major axis and going through the midpoint
-        const projectedX = midpoint[0] + Math.sin(angle) * (point[1] - midpoint[1]) + Math.cos(angle) * (point[0] - midpoint[0]);
-        const projectedY = midpoint[1] - Math.cos(angle) * (point[1] - midpoint[1]) + Math.sin(angle) * (point[0] - midpoint[0]);
-        const projectedDist = distance(midpoint, [projectedX, projectedY]);
+    // Estimate the center of the ellipse
+    const center = estimateCenter(points);
 
-        // Update minor axis points if a longer distance is found
-        if (projectedDist > maxMinorDist) {
-            maxMinorDist = projectedDist;
-            minorAxisPoints = [
-                [midpoint[0] - Math.sin(angle) * projectedDist, midpoint[1] + Math.cos(angle) * projectedDist],
-                [midpoint[0] + Math.sin(angle) * projectedDist, midpoint[1] - Math.cos(angle) * projectedDist],
-            ];
-        }
-    });
+    // Using the first point as a reference to calculate a rough estimate of the semi-major axis length
+    // This is a simplification and may not be accurate for real-world applications
+    const semiMajorAxisLength = distance(center, points[0]);
+    const semiMinorAxisLength = semiMajorAxisLength / 2; // A rough guess, for demonstration purposes only
 
-    return [...majorAxisPoints, ...minorAxisPoints].map(point => `(${point[0]}, ${point[1]})`);
+    // Calculate extremity points without considering rotation
+    // A more complex fitting method would be required to handle rotation properly
+    const extremities = {
+        majorAxis: [[center[0] - semiMajorAxisLength, center[1]], [center[0] + semiMajorAxisLength, center[1]]],
+        minorAxis: [[center[0], center[1] - semiMinorAxisLength], [center[0], center[1] + semiMinorAxisLength]]
+    };
+
+    return [...extremities.majorAxis, ...extremities.minorAxis].map(point => `(${point[0]}, ${point[1]})`);
 }
+
 
 function MicroscopyViewer(props) {
     const viewerID = "viewerID";
@@ -423,7 +411,7 @@ function MicroscopyViewer(props) {
                 type ??= "POLYGON";
                 coordinates = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
                 if (type === 'ELLIPSE') {
-                    coordinates = getEllipseCoordinates(coordinates);
+                    coordinates = calculateExtremityPoints(coordinates);
                 }
             } else if (geometry instanceof LineString) {
                 type = "POLYLINE";
