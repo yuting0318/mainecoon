@@ -42,10 +42,19 @@ function calculateExtremityPoints(coordinates) {
     // Estimate the center of the ellipse
     const center = estimateCenter(points);
 
-    // Using the first point as a reference to calculate a rough estimate of the semi-major axis length
-    // This is a simplification and may not be accurate for real-world applications
-    const semiMajorAxisLength = distance(center, points[0]);
-    const semiMinorAxisLength = semiMajorAxisLength / 2; // A rough guess, for demonstration purposes only
+    // Find the farthest and closest points to the center to estimate the axes
+    let maxDist = 0;
+    let minDist = Infinity;
+    points.forEach(point => {
+        const dist = distance(center, point);
+        if (dist > maxDist) maxDist = dist;
+        if (dist < minDist) minDist = dist;
+    });
+
+    // Assuming the farthest point approximates the semi-major axis
+    // and the closest point approximates the semi-minor axis
+    const semiMajorAxisLength = maxDist;
+    const semiMinorAxisLength = minDist;
 
     // Calculate extremity points without considering rotation
     // A more complex fitting method would be required to handle rotation properly
@@ -56,7 +65,6 @@ function calculateExtremityPoints(coordinates) {
 
     return [...extremities.majorAxis, ...extremities.minorAxis].map(point => `(${point[0]}, ${point[1]})`);
 }
-
 
 function MicroscopyViewer(props) {
     const viewerID = "viewerID";
