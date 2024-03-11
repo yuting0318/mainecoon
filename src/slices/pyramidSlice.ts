@@ -189,10 +189,51 @@ function getPolygonFeature(coordinates: [number[]], style: Style): Feature {
     return result;
 }
 
+function calculateEllipsePoints(points: Coordinate[]) {
+    const [highest, lowest, leftmost, rightmost] = points;
+
+    // Calculate semi-major axis (a) and semi-minor axis (b)
+    const a = Math.sqrt((rightmost[0] - leftmost[0]) ** 2 + (rightmost[1] - leftmost[1]) ** 2) / 2;
+    const b = Math.sqrt((highest[0] - lowest[0]) ** 2 + (highest[1] - lowest[1]) ** 2) / 2;
+
+    // Determine the center (h, k) of the ellipse
+    const h = (leftmost[0] + rightmost[0]) / 2;
+    const k = (highest[1] + lowest[1]) / 2;
+
+    // Estimate the rotation angle theta
+    // Assuming the major axis is closer to the line connecting highest and lowest points
+    const theta = Math.atan2(rightmost[1] - leftmost[1], rightmost[0] - leftmost[0]);
+
+    // Calculate 50 evenly distributed points along the ellipse
+    const pointsOnEllipse = [];
+    for (let i = 0; i < 50; i++) {
+        const t = (2 * Math.PI * i) / 50;
+        const xPrime = a * Math.cos(t) * Math.cos(theta) - b * Math.sin(t) * Math.sin(theta) + h;
+        const yPrime = a * Math.cos(t) * Math.sin(theta) + b * Math.sin(t) * Math.cos(theta) + k;
+        pointsOnEllipse.push([xPrime, yPrime]);
+    }
+
+    return pointsOnEllipse;
+}
+
+
 function getEllipseFeature(coordinates: [number[]], style: Style): Feature {
     console.log("graphicType is ELLIPSE");
     console.log("coordinates", coordinates);
-    return new Feature();
+
+    const formattedCoordinates: Coordinate[] = [];
+
+    _.forEach(coordinates, (coordinate) => {
+        formattedCoordinates.push(coordinate as Coordinate);
+    })
+
+    const result = new Feature({
+        geometry: new Polygon([calculateEllipsePoints(formattedCoordinates)])
+    });
+
+    result.setStyle(style);
+
+    return result;
 }
 
 function getRectangleFeature(coordinates: [number[]], style: Style): Feature {
