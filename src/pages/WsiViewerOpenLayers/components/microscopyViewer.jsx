@@ -441,7 +441,51 @@ function MicroscopyViewer(props) {
 
         // 输出到控制台
         console.log('Grouped Annotations:', groupedAnnotations);
+
+        function extractStudyAndSeriesIdsFromUrl(url) {
+            const regex = /\/WSIViewerOpenLayers\/([^/]+)\/([^/]+)/;
+            const matches = url.match(regex);
+            if (matches && matches.length === 3) {
+                return {
+                    studyId: matches[1],
+                    seriesId: matches[2]
+                };
+            } else {
+                return null;
+            }
+        }
+
+// 获取当前页面的 URL
+        const currentUrl = window.location.href;
+        const ids = extractStudyAndSeriesIdsFromUrl(currentUrl);
+        if (ids) {
+            const studyId = ids.studyId;
+            const seriesId = ids.seriesId;
+            fetch(`http://10.99.1.50:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(groupedAnnotations.map(annotation => annotation.coordinates))
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API response:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } else {
+            console.error("Failed to extract study and series IDs from URL");
+        }
+
     };
+
 
 
 
