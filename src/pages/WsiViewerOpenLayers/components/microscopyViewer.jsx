@@ -17,6 +17,7 @@ import {createStringXY} from 'ol/coordinate';
 import {getCenter} from 'ol/extent';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
+import {toast} from 'react-toastify';
 import Circle from 'ol/geom/Circle';
 
 function calculateExtremityPoints(coordinates) {
@@ -91,6 +92,8 @@ function MicroscopyViewer(props) {
 
     const [isOpen, setIsOpen] = useState(true);
     const [isRightOpen, setIsRightOpen] = useState(true);
+
+    
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
     };
@@ -369,7 +372,6 @@ function MicroscopyViewer(props) {
     };
 
 
-
     function createEllipse(center, semiMajor, semiMinor, rotation = 0, sides = 50) {
         let angleStep = (2 * Math.PI) / sides;
         let coords = [];
@@ -386,7 +388,6 @@ function MicroscopyViewer(props) {
     }
 
     const saveAnnotations = () => {
-        // 获取所有手动添加的标记
         const features = sourceRef.current.getFeatures();
 
         function CustomShape(type, feature) {
@@ -426,20 +427,18 @@ function MicroscopyViewer(props) {
                 coordinates = geometry.getCoordinates().map(coord => formatCoordinate(coord));
             }
 
-            return { type, coordinates };
+            return {type, coordinates};
         });
 
-        // 将每个类型的标记组成一个对象
         const groupedAnnotations = Object.values(savedAnnotations.reduce((acc, curr) => {
             if (acc[curr.type]) {
                 acc[curr.type].coordinates = acc[curr.type].coordinates.concat(curr.coordinates);
             } else {
-                acc[curr.type] = { type: curr.type, coordinates: curr.coordinates };
+                acc[curr.type] = {type: curr.type, coordinates: curr.coordinates};
             }
             return acc;
         }, {}));
 
-        // 输出到控制台
         console.log('Grouped Annotations:', groupedAnnotations);
 
         function extractStudyAndSeriesIdsFromUrl(url) {
@@ -455,23 +454,25 @@ function MicroscopyViewer(props) {
             }
         }
 
-// 获取当前页面的 URL
+
         const currentUrl = window.location.href;
         const ids = extractStudyAndSeriesIdsFromUrl(currentUrl);
         if (ids) {
             const studyId = ids.studyId;
             const seriesId = ids.seriesId;
-            fetch(`http://10.99.1.50:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
+            fetch(`http://localhost:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(groupedAnnotations.map(annotation => annotation.coordinates))
+                body: JSON.stringify(groupedAnnotations.map(annotation => annotation))
             })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
+                        toast.error("發生未知錯誤")
                     }
+                    toast.success("上傳成功")
                     return response.json();
                 })
                 .then(data => {
@@ -482,14 +483,10 @@ function MicroscopyViewer(props) {
                 });
         } else {
             console.error("Failed to extract study and series IDs from URL");
+            toast.error("發生未知錯誤")
         }
 
     };
-
-
-
-
-
 
 
 
@@ -583,11 +580,24 @@ function MicroscopyViewer(props) {
                                     onClick={() => updateDrawType('Ellipse')}>
                                 <Icon icon="mdi:ellipse-outline" className=""/></button>
                         </div>
-                        <div className="text-center">
-                            <button className="bg-gray-300 rounded-lg p-2.5 mt-2"
-                                    onClick={() => updateDrawType('Ellipse')}>
-                                <Icon icon="bx:screenshot" className=""/></button>
+                        <div className="flex">
+                            <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
+                                    onClick={saveAnnotations}>儲存標記
+                            </button>
+
+                            <button
+                                className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">復原
+                            </button>
+                            <button
+                                className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">取消復原
+                            </button>
                         </div>
+
+                        {/*<div className="text-center">*/}
+                        {/*    <button className="bg-gray-300 rounded-lg p-2.5 mt-2"*/}
+                        {/*            onClick={() => updateDrawType('Ellipse')}>*/}
+                        {/*        <Icon icon="bx:screenshot" className=""/></button>*/}
+                        {/*</div>*/}
 
                         <div className="text-center mt-3">
                             <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>
