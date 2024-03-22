@@ -1,6 +1,6 @@
 import React from "react";
 import {useAppSelector} from "Hook";
-
+import L_Modal from "../LoadingModal.jsx"
 import _ from "lodash";
 
 import {ImageResult} from "./ImageResult";
@@ -36,12 +36,9 @@ const ImageResultList: React.FC = () => {
 
 
             )}
-
-            {isLoading && (
-                <>
-                    <span>Loading</span>
-                </>
-            )}
+            <L_Modal isOpen={isLoading}>
+                Loading...
+            </L_Modal>
         </>
     );
 

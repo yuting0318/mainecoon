@@ -1,7 +1,7 @@
 // react
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-
+import L_Modal from "../Main/components/ImageWithReportArea/LoadingModal.jsx"
 
 import { useAppSelector, useAppDispatch } from "Hook";
 import { renderSpecificSeries, renderAllSeries, querySeries } from "Slices/imageWithReportSlice/imageWithReportSlice";
@@ -100,13 +100,16 @@ const WSIViewer: React.FunctionComponent = () => {
         <div className="m-0 p-0 flex-fill">
             <div className="d-flex h-100">
                 {
-                    !(isSuccessAnnotaionStatus) && (
-                        <>
-                            <span className='w-100'>
-                                Loading
-                            </span>
-                        </>
-                    )
+                    // !(isSuccessAnnotaionStatus) && (
+                    //     <>
+                    //         <span className='w-100'>
+                    //             Loading
+                    //         </span>
+                    //     </>
+                    // )
+                    <L_Modal isOpen={!isSuccessAnnotaionStatus}>
+                        Loading...
+                    </L_Modal>
                 }
                 {
                     (isSuccessAnnotaionStatus) && <MicroscopyViewer studyInstanceUID={studyInstanceUID} seriesInstanceUID={seriesInstanceUID} />
