@@ -512,6 +512,16 @@ function MicroscopyViewer(props) {
 
 
 
+    const toggleSwitch = () => {
+        setNewAnnSeries(!newAnnSeries);
+    };
+
+
+    const toggleSwitch1 = () => {
+        setNewAnnAccession(!newAnnAccession);
+    };
+
+
     return (
         <>
             {isOpen ? (
@@ -585,7 +595,49 @@ function MicroscopyViewer(props) {
                             <p className="ml-2">AnatomicStructure:</p>
                         </div>
 
-                        <div className="text-center">
+                        <div className="flex items-center ml-1 mt-3">
+
+                            <button
+                                className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${
+                                    newAnnSeries ? 'bg-green-400' : 'bg-gray-300'
+                                }`}
+                                onClick={toggleSwitch}
+                            >
+                            <span
+                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                                    newAnnSeries ? 'translate-x-full' : ''}`}/>
+                            </button>
+                            {/*<span className="ml-2 text-gray-600">{newAnnSeries ? 'ON' : 'OFF'}</span>*/}
+                            <label className="ml-3 text-2xl " >NewAnnSeries</label>
+
+                        </div>
+                        <div className="ml-1">
+
+                            <button
+                                className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${
+                                    newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
+                                }`}
+                                onClick={toggleSwitch1}
+                            >
+                            <span
+                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                                    newAnnAccession ? 'translate-x-full' : ''}`}/>
+                            </button>
+                            {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
+                            <label  className="ml-3 text-2xl ">NewAnnAccession</label>
+
+                            {newAnnAccession && (
+                                <input
+                                    type="text"
+                                    placeholder="Accession Number"
+                                    value={accessionNumber}
+                                    className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"
+                                    onChange={(e) => setAccessionNumber(e.target.value)}
+                                />
+                            )}
+                        </div>
+
+                        <div className="text-center mt-2">
                             <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>
                             <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 "
                                     onClick={() => updateDrawType('Point')}>
@@ -604,22 +656,7 @@ function MicroscopyViewer(props) {
                                 <Icon icon="mdi:ellipse-outline" className=""/></button>
                         </div>
 
-                        <div>
-                            <label>NewAnnSeries:</label>
-                            <input type="checkbox" checked={newAnnSeries} onChange={(e) => setNewAnnSeries(e.target.checked)} />
-                        </div>
-                        <div>
-                            <label>NewAnnAccession:</label>
-                            <input type="checkbox" checked={newAnnAccession} onChange={(e) => setNewAnnAccession(e.target.checked)} />
-                            {newAnnAccession && (
-                                <input
-                                    type="text"
-                                    placeholder="Accession Number"
-                                    value={accessionNumber}
-                                    onChange={(e) => setAccessionNumber(e.target.value)}
-                                />
-                            )}
-                        </div>
+
                         <div className="flex">
                             <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
                                     onClick={saveAnnotations}>儲存標記
