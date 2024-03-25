@@ -99,14 +99,7 @@ function MicroscopyViewer(props) {
     const [accessionNumber, setAccessionNumber] = useState('');
 
 
-    const extractOldAnnSeriesOIDFromUrl = (url) => {
-        const regex = /某正則表達式/;
-        const matches = url.match(regex);
-        return matches ? matches[1] : null; // 假設 OID 在網址中的位置
-    };
 
-    const oldAnnSeriesOID = extractOldAnnSeriesOIDFromUrl(window.location.href);
-    
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
     };
@@ -475,12 +468,13 @@ function MicroscopyViewer(props) {
             const seriesId = ids.seriesId;
             const formattedData = {
                 NewAnnSeries: newAnnSeries ? "true" : "false",
-                OldAnnSeriesOID: oldAnnSeriesOID,
+                OldAnnSeriesOID: seriesId,
                 NewAnnAccession: newAnnAccession ? "true" : "false",
                 AccessionNumber: accessionNumber,
                 data: groupedAnnotations.map(annotation => annotation) // 原有的轉換邏輯
             };
 
+            console.log('Formatted Data:', formattedData);
             // 使用 formattedData 作為請求體
             fetch(`http://localhost:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
                 method: 'POST',
