@@ -93,6 +93,19 @@ function MicroscopyViewer(props) {
     const [isOpen, setIsOpen] = useState(true);
     const [isRightOpen, setIsRightOpen] = useState(true);
 
+
+    const [newAnnSeries, setNewAnnSeries] = useState(false);
+    const [newAnnAccession, setNewAnnAccession] = useState(false);
+    const [accessionNumber, setAccessionNumber] = useState('');
+
+
+    const extractOldAnnSeriesOIDFromUrl = (url) => {
+        const regex = /某正則表達式/;
+        const matches = url.match(regex);
+        return matches ? matches[1] : null; // 假設 OID 在網址中的位置
+    };
+
+    const oldAnnSeriesOID = extractOldAnnSeriesOIDFromUrl(window.location.href);
     
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
@@ -460,12 +473,21 @@ function MicroscopyViewer(props) {
         if (ids) {
             const studyId = ids.studyId;
             const seriesId = ids.seriesId;
+            const formattedData = {
+                NewAnnSeries: newAnnSeries ? "true" : "false",
+                OldAnnSeriesOID: oldAnnSeriesOID,
+                NewAnnAccession: newAnnAccession ? "true" : "false",
+                AccessionNumber: accessionNumber,
+                data: groupedAnnotations.map(annotation => annotation) // 原有的轉換邏輯
+            };
+
+            // 使用 formattedData 作為請求體
             fetch(`http://localhost:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(groupedAnnotations.map(annotation => annotation))
+                body: JSON.stringify(formattedData)
             })
                 .then(response => {
                     if (!response.ok) {
@@ -488,7 +510,11 @@ function MicroscopyViewer(props) {
 
     };
 
-
+    const [isActive, setIsActive] = useState(false);
+    const handleToggle = (e) => {
+        setIsActive(!isActive);
+        // 在這裡執行更多操作，如發送請求等
+    };
 
 
 
@@ -540,13 +566,16 @@ function MicroscopyViewer(props) {
             <div className="w-100 h-100 flex text-center" id={viewerID}></div>
             {isRightOpen ? (
                 <div className="flex flex-row w-96">
+
                     <div className="flex flex-column w-full border-start">
+
                         <div className="bg-opacity-100 flex justify-start items-end mt-2">
                             <button
                                 className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"
                                 onClick={RightDrawer}>
                                 {'>>'}
                             </button>
+
                         </div>
                         <div className="mt-2">
                             <label className="ml-2 text-2xl ">SlideLabel</label>
@@ -580,6 +609,23 @@ function MicroscopyViewer(props) {
                                     onClick={() => updateDrawType('Ellipse')}>
                                 <Icon icon="mdi:ellipse-outline" className=""/></button>
                         </div>
+
+                        <div>
+                            <label>NewAnnSeries:</label>
+                            <input type="checkbox" checked={newAnnSeries} onChange={(e) => setNewAnnSeries(e.target.checked)} />
+                        </div>
+                        <div>
+                            <label>NewAnnAccession:</label>
+                            <input type="checkbox" checked={newAnnAccession} onChange={(e) => setNewAnnAccession(e.target.checked)} />
+                            {newAnnAccession && (
+                                <input
+                                    type="text"
+                                    placeholder="Accession Number"
+                                    value={accessionNumber}
+                                    onChange={(e) => setAccessionNumber(e.target.value)}
+                                />
+                            )}
+                        </div>
                         <div className="flex">
                             <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
                                     onClick={saveAnnotations}>儲存標記
@@ -599,17 +645,18 @@ function MicroscopyViewer(props) {
                         {/*        <Icon icon="bx:screenshot" className=""/></button>*/}
                         {/*</div>*/}
 
-                        <div className="text-center mt-3">
-                            <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>
-                            <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"
-                                    onClick={() => updateDrawType('Point')}>啟動
-                            </button>
-                            <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"
-                                    onClick={() => updateDrawType('LineString')}>關閉
-                            </button>
-                            <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存
-                            </button>
-                        </div>
+                        {/*<div className="text-center mt-3">*/}
+                        {/*    <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>*/}
+                        {/*    <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"*/}
+                        {/*            onClick={() => updateDrawType('Point')}>啟動*/}
+                        {/*    </button>*/}
+                        {/*    <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"*/}
+                        {/*            onClick={() => updateDrawType('LineString')}>關閉*/}
+                        {/*    </button>*/}
+                        {/*    <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存*/}
+                        {/*    </button>*/}
+                        {/*</div>*/}
+
 
                     </div>
                 </div>
