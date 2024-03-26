@@ -522,6 +522,20 @@ function MicroscopyViewer(props) {
     };
 
 
+    useEffect(() => {
+        // 获取当前页面的 URL
+        const url = window.location.href;
+
+        // 获取最后一个斜杠后面的内容
+        const lastSlashIndex = url.lastIndexOf('/');
+        const extractedContent = url.substring(lastSlashIndex + 1);
+
+        // 打印提取的内容到控制台
+        console.log(extractedContent);
+    }, []);
+
+
+
     return (
         <>
             {isOpen ? (
