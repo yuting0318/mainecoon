@@ -472,11 +472,11 @@ function MicroscopyViewer(props) {
                 OldAnnSeriesOID: seriesId,
                 NewAnnAccession: newAnnAccession ? "true" : "false",
                 AccessionNumber: accessionNumber,
-                data: groupedAnnotations.map(annotation => annotation) // 原有的轉換邏輯
+                data: savedAnnotations.map(annotation => annotation) // 原有的轉換邏輯
             };
 
             console.log('Formatted Data:', formattedData);
-            // 使用 formattedData 作為請求體
+            //使用 formattedData 作為請求體
             fetch(`http://localhost:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
                 method: 'POST',
                 headers: {
