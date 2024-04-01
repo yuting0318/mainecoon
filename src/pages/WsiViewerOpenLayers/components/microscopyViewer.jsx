@@ -109,6 +109,7 @@ function MicroscopyViewer(props) {
 
     const RightDrawer = () => {
         setIsRightOpen(!isRightOpen);
+        setTimeout(function () { mapRef.current?.updateSize()},200)
     };
 
     useEffect(() => {
@@ -626,12 +627,13 @@ function MicroscopyViewer(props) {
     }
 
 
+
     return (
         <>
             {isOpen ? (
                 <>
-                    <div className="flex flex-row w-96">
-                        <div className={`flex flex-column w-full border-end`}>
+                    <div className="flex flex-row w-96 overflow-y-scroll">
+                        <div className={`flex flex-column w-full border-end `}>
                             <div className="bg-opacity-100 flex justify-end items-end z-30 mt-2">
                                 <button
                                     className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg p-3"
@@ -639,7 +641,7 @@ function MicroscopyViewer(props) {
                                     {'<<'}
                                 </button>
                             </div>
-                            <div className="flex flex-row items-center bg-green-300 mt-6">
+                            <div className="flex flex-row items-center bg-green-300 mt-2">
                                 <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">
                                     Patient
                                 </label> <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
@@ -677,8 +679,26 @@ function MicroscopyViewer(props) {
                                         className="font-bold">Time : </span>{StudyTime}</span>
                                 </div>
                             </div>
+                            <div className="mt-2">
+                                <label className="ml-2 text-2xl ">SlideLabel</label>
+                            </div>
+                            <div className="bg-[#e8e8e8] mt-2">
+                                <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
+                                <p className="block ml-2 text-xl">BarcodeValue:</p>
+                            </div>
+                            <div>
+                                <label className="ml-2 text-2xl">Specimens</label>
+                            </div>
+                            <div className="bg-[#e8e8e8] mt-2 text-xl ">
+                                <p className="ml-2">AnatomicStructure:</p>
+                            </div>
                         </div>
+
+
+
                     </div>
+
+
                 </>
             ) : (
                 <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
@@ -691,168 +711,207 @@ function MicroscopyViewer(props) {
 
             )}
 
-            <div className="w-100 h-100 flex text-center border-4 border-red-500" id={viewerID}></div>
-            {isRightOpen ? (
-                <div className="flex flex-row w-96">
 
-                    <div className="flex flex-column w-full border-start">
 
-                        <div className="bg-opacity-100 flex justify-start items-end mt-2">
-                            <button
-                                className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"
-                                onClick={RightDrawer}>
-                                {'>>'}
-                            </button>
+            <div className="w-100 h-100 flex flex-col text-center" id={viewerID}>
+                <div className="flex flex-row justify-between m-2 gap-2 border-b-2">
+                <button className="bg-yellow-200   rounded-lg p-2.5 mr-2 mb-2 "
+                        onClick={() => updateDrawType('POINT')}>
+                    <Icon icon="tabler:point-filled" className="text-black"/>
+                </button>
+                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                        onClick={() => updateDrawType('POLYLINE')}>
+                    <Icon icon="material-symbols-light:polyline-outline" className="text-black"/>
+                </button>
+                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                        onClick={() => updateDrawType('POLYGON')}>
+                    <Icon icon="ph:polygon" className="text-black"/></button>
+                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                        onClick={() => updateDrawType('RECTANGLE')}>
+                    <Icon icon="f7:rectangle" className="text-black"/></button>
+                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                        onClick={() => updateDrawType('ELLIPSE')}>
+                    <Icon icon="mdi:ellipse-outline" className="text-black"/></button>
+                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                        onClick={() => updateDrawType('ELLIPSE')}>
+                    <Icon icon="bx:screenshot" className="text-black"/></button>
 
-                        </div>
-                        <div className="mt-2">
-                            <label className="ml-2 text-2xl ">SlideLabel</label>
-                        </div>
-                        <div className="bg-[#e8e8e8] mt-2">
-                            <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
-                            <p className="block ml-2 text-xl">BarcodeValue:</p>
-                        </div>
-                        <div>
-                            <label className="ml-2 text-2xl">Specimens</label>
-                        </div>
-                        <div className="bg-[#e8e8e8] mt-2 text-xl ">
-                            <p className="ml-2">AnatomicStructure:</p>
-                        </div>
-
-                        <div className="flex items-center ml-1 mt-3">
-
-                            <button
-                                className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${
-                                    newAnnSeries ? 'bg-green-400' : 'bg-gray-300'
-                                }`}
-                                onClick={toggleSwitch}
-                            >
-                            <span
-                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                                    newAnnSeries ? 'translate-x-full' : ''}`}/>
-                            </button>
-                            {/*<span className="ml-2 text-gray-600">{newAnnSeries ? 'ON' : 'OFF'}</span>*/}
-                            <label className="ml-3 text-2xl " >NewAnnSeries</label>
-
-                        </div>
-                        <div className="ml-1">
-
-                            <button
-                                className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${
-                                    newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
-                                }`}
-                                onClick={toggleSwitch1}
-                            >
+                    <div className="mt-2">
+                    <button
+                        className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${
+                            newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
+                        }`}
+                        onClick={toggleSwitch1}
+                    >
                             <span
                                 className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
                                     newAnnAccession ? 'translate-x-full' : ''}`}/>
-                            </button>
-                            {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
-                            <label  className="ml-3 text-2xl ">NewAnnAccession</label>
+                    </button>
+                    {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
+                    <label  className="ml-3 text-xs">NewAnnAccession</label>
 
-                            {newAnnAccession && (
-                                <input
-                                    type="text"
-                                    placeholder="Accession Number"
-                                    value={accessionNumber}
-                                    className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"
-                                    onChange={(e) => setAccessionNumber(e.target.value)}
-                                />
-                            )}
-                        </div>
-
-                        <div className="text-center mt-2">
-                            <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>
-                            <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 "
-                                    onClick={() => updateDrawType('Point')}>
-                                <Icon icon="tabler:point-filled" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('LineString')}>
-                                <Icon icon="material-symbols-light:polyline-outline" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('Polygon')}>
-                                <Icon icon="ph:polygon" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('Rectangle')}>
-                                <Icon icon="f7:rectangle" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('Ellipse')}>
-                                <Icon icon="mdi:ellipse-outline" className=""/></button>
-                        </div>
-
-
-                        <div className="flex justify-evenly">
-                            <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
-                                    onClick={saveAnnotations}>儲存標記
-                            </button>
-
-                            <button
-                                className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
-                                onClick={undoFeature}
-                            >復原
-                            </button>
-                            {/* TODO */}
-                            {/*<button*/}
-                            {/*    className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">取消復原*/}
-                            {/*</button>*/}
-                        </div>
-
-                        {/*<div className="text-center">*/}
-                        {/*    <button className="bg-gray-300 rounded-lg p-2.5 mt-2"*/}
-                        {/*            onClick={() => updateDrawType('Ellipse')}>*/}
-                        {/*        <Icon icon="bx:screenshot" className=""/></button>*/}
-                        {/*</div>*/}
-
-                        {/*<div className="text-center mt-3">*/}
-                        {/*    <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>*/}
-                        {/*    <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"*/}
-                        {/*            onClick={() => updateDrawType('Point')}>啟動*/}
-                        {/*    </button>*/}
-                        {/*    <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"*/}
-                        {/*            onClick={() => updateDrawType('LineString')}>關閉*/}
-                        {/*    </button>*/}
-                        {/*    <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存*/}
-                        {/*    </button>*/}
-                        {/*</div>*/}
-
-
+                    {newAnnAccession && (
+                        <input
+                            type="text"
+                            placeholder="Accession Number"
+                            value={accessionNumber}
+                            className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"
+                            onChange={(e) => setAccessionNumber(e.target.value)}
+                        />
+                    )}
                     </div>
-                </div>
-            ) : (
-                <>
-                    <div className="bg-opacity-0 flex flex-column justify-start items-end mt-60 gap-10">
-                        <div className="bg-opacity-0 flex">
-                            <button
-                                className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"
-                                onClick={RightDrawer}>
-                                {'<'}
-                            </button>
-                        </div>
-                        <div className="flex flex-column mb-5 gap-2">
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
-                                    onClick={() => updateDrawType('POINT')}>
-                                <Icon icon="tabler:point-filled" className=""/>
-                            </button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('POLYLINE')}>
-                                <Icon icon="material-symbols-light:polyline-outline" className=""/>
-                            </button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('POLYGON')}>
-                                <Icon icon="ph:polygon" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('RECTANGLE')}>
-                                <Icon icon="f7:rectangle" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2 "
-                                    onClick={() => updateDrawType('ELLIPSE')}>
-                                <Icon icon="mdi:ellipse-outline" className=""/></button>
-                            <button className="bg-gray-300 rounded-lg p-2.5 mr-2"
-                                    onClick={() => updateDrawType('ELLIPSE')}>
-                                <Icon icon="bx:screenshot" className=""/></button>
-                        </div>
+                    <div className="justify-end flex">
+                    <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2"
+                            onClick={saveAnnotations}>儲存標記
+                    </button>
+
+                    <button
+                        className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2"
+                        onClick={undoFeature}
+                    >復原
+                    </button>
                     </div>
-                </>
-            )}
+            </div>
+            </div>
+            {/*{isRightOpen ? (*/}
+            {/*    <div className="flex flex-row w-96">*/}
+
+            {/*        <div className="flex flex-column w-full border-start">*/}
+
+            {/*            <div className="bg-opacity-100 flex justify-start items-end mt-2">*/}
+            {/*                <button*/}
+            {/*                    className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"*/}
+            {/*                    onClick={RightDrawer}>*/}
+            {/*                    {'>>'}*/}
+            {/*                </button>*/}
+
+            {/*            </div>*/}
+            {/*            <div className="mt-2">*/}
+            {/*                <label className="ml-2 text-2xl ">SlideLabel</label>*/}
+            {/*            </div>*/}
+            {/*            <div className="bg-[#e8e8e8] mt-2">*/}
+            {/*                <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>*/}
+            {/*                <p className="block ml-2 text-xl">BarcodeValue:</p>*/}
+            {/*            </div>*/}
+            {/*            <div>*/}
+            {/*                <label className="ml-2 text-2xl">Specimens</label>*/}
+            {/*            </div>*/}
+            {/*            <div className="bg-[#e8e8e8] mt-2 text-xl ">*/}
+            {/*                <p className="ml-2">AnatomicStructure:</p>*/}
+            {/*            </div>*/}
+
+            {/*            <div className="flex items-center ml-1 mt-3">*/}
+
+            {/*                <button*/}
+            {/*                    className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${*/}
+            {/*                        newAnnSeries ? 'bg-green-400' : 'bg-gray-300'*/}
+            {/*                    }`}*/}
+            {/*                    onClick={toggleSwitch}*/}
+            {/*                >*/}
+            {/*                <span*/}
+            {/*                    className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${*/}
+            {/*                        newAnnSeries ? 'translate-x-full' : ''}`}/>*/}
+            {/*                </button>*/}
+            {/*                /!*<span className="ml-2 text-gray-600">{newAnnSeries ? 'ON' : 'OFF'}</span>*!/*/}
+            {/*                <label className="ml-3 text-2xl " >NewAnnSeries</label>*/}
+
+            {/*            </div>*/}
+            {/*            <div className="ml-1">*/}
+
+            {/*                <button*/}
+            {/*                    className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${*/}
+            {/*                        newAnnAccession ? 'bg-green-400' : 'bg-gray-300'*/}
+            {/*                    }`}*/}
+            {/*                    onClick={toggleSwitch1}*/}
+            {/*                >*/}
+            {/*                <span*/}
+            {/*                    className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${*/}
+            {/*                        newAnnAccession ? 'translate-x-full' : ''}`}/>*/}
+            {/*                </button>*/}
+            {/*                /!*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*!/*/}
+            {/*                <label  className="ml-3 text-2xl ">NewAnnAccession</label>*/}
+
+                            {/*{newAnnAccession && (*/}
+                            {/*    <input*/}
+                            {/*        type="text"*/}
+                            {/*        placeholder="Accession Number"*/}
+                            {/*        value={accessionNumber}*/}
+                            {/*        className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"*/}
+                            {/*        onChange={(e) => setAccessionNumber(e.target.value)}*/}
+                            {/*    />*/}
+                            {/*)}*/}
+            {/*            </div>*/}
+
+            {/*            <div className="text-center mt-2">*/}
+            {/*                <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>*/}
+            {/*                <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 "*/}
+            {/*                        onClick={() => updateDrawType('Point')}>*/}
+            {/*                    <Icon icon="tabler:point-filled" className=""/></button>*/}
+            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
+            {/*                        onClick={() => updateDrawType('LineString')}>*/}
+            {/*                    <Icon icon="material-symbols-light:polyline-outline" className=""/></button>*/}
+            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
+            {/*                        onClick={() => updateDrawType('Polygon')}>*/}
+            {/*                    <Icon icon="ph:polygon" className=""/></button>*/}
+            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
+            {/*                        onClick={() => updateDrawType('Rectangle')}>*/}
+            {/*                    <Icon icon="f7:rectangle" className=""/></button>*/}
+            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
+            {/*                        onClick={() => updateDrawType('Ellipse')}>*/}
+            {/*                    <Icon icon="mdi:ellipse-outline" className=""/></button>*/}
+            {/*            </div>*/}
+
+
+            {/*            <div className="flex justify-evenly">*/}
+            {/*                <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"*/}
+            {/*                        onClick={saveAnnotations}>儲存標記*/}
+            {/*                </button>*/}
+
+            {/*                <button*/}
+            {/*                    className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"*/}
+            {/*                    onClick={undoFeature}*/}
+            {/*                >復原*/}
+            {/*                </button>*/}
+            {/*                /!* TODO *!/*/}
+            {/*                /!*<button*!/*/}
+            {/*                /!*    className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">取消復原*!/*/}
+            {/*                /!*</button>*!/*/}
+            {/*            </div>*/}
+
+            {/*            /!*<div className="text-center">*!/*/}
+            {/*            /!*    <button className="bg-gray-300 rounded-lg p-2.5 mt-2"*!/*/}
+            {/*            /!*            onClick={() => updateDrawType('Ellipse')}>*!/*/}
+            {/*            /!*        <Icon icon="bx:screenshot" className=""/></button>*!/*/}
+            {/*            /!*</div>*!/*/}
+
+            {/*            /!*<div className="text-center mt-3">*!/*/}
+            {/*            /!*    <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>*!/*/}
+            {/*            /!*    <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"*!/*/}
+            {/*            /!*            onClick={() => updateDrawType('Point')}>啟動*!/*/}
+            {/*            /!*    </button>*!/*/}
+            {/*            /!*    <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"*!/*/}
+            {/*            /!*            onClick={() => updateDrawType('LineString')}>關閉*!/*/}
+            {/*            /!*    </button>*!/*/}
+            {/*            /!*    <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存*!/*/}
+            {/*            /!*    </button>*!/*/}
+            {/*            /!*</div>*!/*/}
+
+
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*) : (*/}
+            {/*    <>*/}
+            {/*        <div className="bg-opacity-0 flex flex-column justify-start items-end mt-60 gap-10">*/}
+            {/*            <div className="bg-opacity-0 flex ">*/}
+            {/*                <button*/}
+            {/*                    className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"*/}
+            {/*                    onClick={RightDrawer}>*/}
+            {/*                    {'<'}*/}
+            {/*                </button>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </>*/}
+            {/*)}*/}
 
         </>
     )
