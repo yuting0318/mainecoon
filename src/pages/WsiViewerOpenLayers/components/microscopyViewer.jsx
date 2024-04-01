@@ -143,6 +143,7 @@ function MicroscopyViewer(props) {
                 const specificFrameObject = _.get(frames, index);
                 const url = _.get(_.get(_.get(specificFrameObject, "url"), queryMode), "rendered");
 
+
                 return url;
             },
             maxZoom: maxLevel,
@@ -489,6 +490,9 @@ function MicroscopyViewer(props) {
                         toast.error("發生未知錯誤")
                     }
                     toast.success("上傳成功")
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
                     return response.json();
                 })
                 .then(data => {
