@@ -29,8 +29,8 @@ const ImageWithReportArea = () => {
             </div>
 
             <div className="h-56 flex overflow-x-auto ">
-                {/*<ReportList />*/}
-                <ImageResultList/>
+                <ReportList />
+                {/*<ImageResultList/>*/}
             </div>
 
 

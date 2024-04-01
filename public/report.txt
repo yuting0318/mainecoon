@@ -1,0 +1,35 @@
+PATHOLOGICAL DIAGNOSIS:
+1. Lung, left upper lobe, wedge resection
+   --- Minimally invasive adenocarcinoma, pT1miN0
+2. Lymph nodes, para-aortic (1), subaortic (1), inferior
+pulmonary ligament (2), biopsy
+   --- Anthracosis
+
+GROSS FINDING:
+The specimen received consists of two parts. Part (A) is a
+wedge-shaped lung tissue labeled "LUL wedge", measuring 8.2 x
+3.5 x 3.0 cm. A gray
+white tumor, 1.4 x 1.1 x 1.1 cm, is noted 1.5 cm
+from the stapled margin, 0.9 cm from the visceral pleura. The
+non-tumorous parenchyma is congested and hemorrhagic. Part (B)
+consists of lymph nodes labeled as above. Representative parts
+are taken for sections in 7 blocks. (A:stapled margin,
+B-C:tumor, D:non-tumorous parenchyma, E:para-aortic LNs,
+F:subaortic, G:inferior pulmonary ligament LNs) (CYC)
+
+MICROSCOPIC FINDING:
+1. Histologic type: Minimally invasive adenocarcinoma
+2. Histologic pattern: lepidic (70%), acinar (30%)
+3. Cell type: non-mucinous tumor cells
+4. Total tumor size: 1.4 x 1.1 x 1.1 cm
+5. Size of invasive focus: 0.4 cm
+6. Tumor differentiation: well differentiated (G1)
+7. Angiolymphatic invasion: absent
+8. Perineural invasion: absent
+9. Spread Through Air Spaces (STAS): absent
+10. Tumor necrosis: absent
+11. Pleural invasion: absent (PL0)
+12. Resection margin: free of tumor involvement
+13. Lymph nodes: all without metastatic tumor
+14. Non-tumorous parenchyma: congestion
+15. Pathological staging: pT1miN0 (AJCC 8th edition).
