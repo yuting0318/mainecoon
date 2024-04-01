@@ -339,6 +339,14 @@ function MicroscopyViewer(props) {
         return coords;
     }
 
+    function undoFeature() {
+        const features = sourceRef.current.getFeatures();
+        if (features.length > 0) {
+            const lastFeature = features[features.length - 1];
+            sourceRef.current.removeFeature(lastFeature);
+        }
+    }
+
     function calculateRadius(coord1, coord2) {
         return Math.sqrt(Math.pow(coord1[0] - coord2[0], 2) + Math.pow(coord1[1] - coord2[1], 2));
     }
@@ -675,17 +683,20 @@ function MicroscopyViewer(props) {
                         </div>
 
 
-                        <div className="flex">
+                        <div className="flex justify-evenly">
                             <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
                                     onClick={saveAnnotations}>儲存標記
                             </button>
 
                             <button
-                                className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">復原
+                                className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"
+                                onClick={undoFeature}
+                            >復原
                             </button>
-                            <button
-                                className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">取消復原
-                            </button>
+                            {/* TODO */}
+                            {/*<button*/}
+                            {/*    className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">取消復原*/}
+                            {/*</button>*/}
                         </div>
 
                         {/*<div className="text-center">*/}
