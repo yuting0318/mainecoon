@@ -9,9 +9,10 @@ import { sortSpecificPyramid, convertAnnotation } from "Slices/pyramidSlice";
 import { Study, Series, Instance, Frame } from "csy-dicomweb-wado-rs-uri";
 import _, { StringIterator } from "lodash";
 
-import Header from "Components/Header";
+import SearchPageHeader from "../../components/SearchPageHeader";
 import MicroscopyViewer from "./components/microscopyViewer";
 import RightAside from "./components/rightAside";
+import Header from "../../components/Header";
 
 
 const WSIViewer: React.FunctionComponent = () => {

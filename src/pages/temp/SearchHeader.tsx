@@ -3,11 +3,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from "Hook";
 import _ from "lodash";
 
-import { QueryParameter_StudyDate } from "./SearchHeader/QueryParameter/StudyDate";
-import { QueryParameter_AccessionNumber } from "./SearchHeader/QueryParameter/AccessionNumber";
-import { QueryParameter_StudyUID } from "./SearchHeader/QueryParameter/StudyUID";
-import { QueryParameter_PatientName } from "./SearchHeader/QueryParameter/PatientName";
-import { QueryParameter_PatientID } from "./SearchHeader/QueryParameter/PatientID";
+import { QueryParameter_StudyDate } from "../Main/components/SearchArea/components/SearchHeader/QueryParameter/StudyDate";
+import { QueryParameter_AccessionNumber } from "../Main/components/SearchArea/components/SearchHeader/QueryParameter/AccessionNumber";
+import { QueryParameter_StudyUID } from "../Main/components/SearchArea/components/SearchHeader/QueryParameter/StudyUID";
+import { QueryParameter_PatientName } from "../Main/components/SearchArea/components/SearchHeader/QueryParameter/PatientName";
+import { QueryParameter_PatientID } from "./PatientID";
 
 const SearchHeader: React.FC = () => {
 

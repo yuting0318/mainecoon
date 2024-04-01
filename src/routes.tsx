@@ -2,12 +2,12 @@ import React, { Children } from "react";
 import type { RouteObject } from "react-router-dom";
 import Home from "Pages/home";
 import NotFound from "Pages/notFound";
-import Main from "Pages/Main";
+import Main from "./pages/Main";
 import './index.css'
 import WSIViewerOpenLayers from "Pages/WsiViewerOpenLayers";
 import WSIViewerWithReport from "Pages/WsiViewerWithReport";
 import WSIViwerByStudy from "Pages/WsiViewerByStudy";
-import Header from "Components/Header";
+import SearchPageHeader from "./components/SearchPageHeader";
 
 const routes: RouteObject[] = [
   {

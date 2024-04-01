@@ -9,8 +9,9 @@ import { sortSpecificPyramid, convertAnnotation } from "Slices/pyramidSlice";
 import { Study, Series, Instance, Frame } from "csy-dicomweb-wado-rs-uri";
 import _, { StringIterator } from "lodash";
 
-import Header from "Components/Header";
+import SearchPageHeader from "../../components/SearchPageHeader";
 import MicroscopyViewer from "./components/microscopyViewer";
+import Header from "../../components/Header";
 
 
 
@@ -112,7 +113,8 @@ const WSIViewer: React.FunctionComponent = () => {
                     </L_Modal>
                 }
                 {
-                    (isSuccessAnnotaionStatus) && <MicroscopyViewer studyInstanceUID={studyInstanceUID} seriesInstanceUID={seriesInstanceUID} />
+                    (isSuccessAnnotaionStatus) &&
+                        <MicroscopyViewer studyInstanceUID={studyInstanceUID} seriesInstanceUID={seriesInstanceUID} />
                 }
             </div>
         </div>

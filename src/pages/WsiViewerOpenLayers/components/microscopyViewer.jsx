@@ -19,6 +19,8 @@ import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 import {toast} from 'react-toastify';
 import Circle from 'ol/geom/Circle';
+import {QIDO_RS_Response} from "Slices/searchAreaSlice/components/enums/QIDO_RS_Response";
+import {querySeries} from "Slices/imageWithReportSlice/imageWithReportSlice";
 
 function calculateExtremityPoints(coordinates) {
     const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
@@ -118,6 +120,8 @@ function MicroscopyViewer(props) {
         const totalPixelMatrixRows = _.first(_.get(_.get(bigestInstanceMetadata, "00480007"), "Value"));
         const extent = [0, 0, totalPixelMatrixColumns, totalPixelMatrixRows];
 
+        console.log('minLevel',minLevel)
+        console.log('maxLevel',maxLevel)
         const dicomProjection = new Projection({
             code: 'DICOM',
             units: 'pixels',
@@ -129,7 +133,7 @@ function MicroscopyViewer(props) {
                 const z = tileCoord[0];
                 const x = tileCoord[1];
                 const y = tileCoord[2];
-
+                console.log('x,y,z',x,y,z)
                 const currentInstance = Instances[z]; // 當前的 Instance
                 const currentInstanceMetadata = _.get(currentInstance, "metadata"); // 當前 Instance 的 Metadata
 
@@ -137,6 +141,9 @@ function MicroscopyViewer(props) {
                 const currentInstanceSingleImageWidth = _.first(_.get(_.get(currentInstanceMetadata, "00280011"), "Value")); // 每張小圖的寬
                 const widthImageCount = Math.ceil(currentInstanceTotalPixelMatrixColumns / currentInstanceSingleImageWidth); // 寬度部分要擺多少張
                 const index = x + y * widthImageCount // 計算 Index
+                console.log('index',index)
+
+                console.log('currentInstanceTotalPixelMatrixColumns',currentInstanceTotalPixelMatrixColumns)
 
                 const queryMode = _.get(currentInstance, "queryMode");
                 const frames = _.get(currentInstance, "Frames");
@@ -543,8 +550,6 @@ function MicroscopyViewer(props) {
         // 在這裡執行更多操作，如發送請求等
     };
 
-
-
     const toggleSwitch = () => {
         setNewAnnSeries(!newAnnSeries);
     };
@@ -567,6 +572,58 @@ function MicroscopyViewer(props) {
         console.log(extractedContent);
     }, []);
 
+    const [data, setData] = useState([]);
+    // 確認studyInstanceUID是否有值(問!!!!!!!!!!!!!!!)
+    const fetchDetails = async() => {
+        try{
+            const response = await fetch(`https://ditto.dicom.tw/dicom-web/studies?ModalitiesInStudy=SM&StudyInstanceUID=${studyInstanceUID}`);
+            const data = await response.json();
+            setData(data)
+            console.log('data02313',data);console.log('data[0].0020000D',data[0]["00080020"].Value[0])
+        }catch (e) {
+            console.log('error',e)
+        }
+    }
+
+    useEffect(() => {
+        fetchDetails();
+    }, []);
+
+    function getQidorsSingleStudyMetadataValue(data, metadataTag, defaultValue) {
+        return _.get(data, metadataTag) ? _.get(data, metadataTag).Value[0] : defaultValue;
+        // return _.isUndefined(_.first(_.get(data, metadataTag).Value[0])) ? defaultValue : _.first(_.get(data, metadataTag).Value[0]);
+        console.log('data',data)
+        // console.log('metadataTag',metadataTag)
+        // console.log('defaultValue',defaultValue)
+    }
+    const patientID= getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.PatientID, "PatientID NotFound");
+    const patientName = _.get(getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.PatientName, "PatientName NotFound"), "Alphabetic");
+    const patientBirthDate= formatDate(getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.PatientBirthDate, "PatientBirthDate NotFound"));
+    const patientSex= getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.PatientSex, "PatientSex NotFound");
+    const accessionNumber2= getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.AccessionNumber, "AccessionNumber NotFound");
+    const studyDate= formatDate(getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.StudyDate, "StudyDate NotFound"));
+    const StudyTime= formatTime(getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.StudyTime, "StudyTime NotFound"));
+
+    // console.log("patientID", patientID)
+    // console.log("patientName", patientName)
+    // console.log("patientBirthDate", formatDate(patientBirthDate))
+    // console.log("patientSex", patientSex)
+    // console.log("accessionNumber", accessionNumber2)
+    // console.log("studyDate", formatDate(studyDate))
+    // console.log("StudyTime", formatTime(StudyTime))
+
+    function formatDate(inputDate) {
+        const year = inputDate.substring(0, 4);
+        const month = inputDate.substring(4, 6);
+        const day = inputDate.substring(6, 8);
+        return `${year}-${month}-${day}`;
+    }
+    function formatTime(inputTime) {
+        const hours = inputTime.substring(0, 2);
+        const minutes = inputTime.substring(2, 4);
+        const seconds = inputTime.substring(4, 6);
+        return `${hours}:${minutes}:${seconds}`;
+    }
 
 
     return (
@@ -582,23 +639,43 @@ function MicroscopyViewer(props) {
                                     {'<<'}
                                 </button>
                             </div>
-                            <div>
-                                <label className="ml-2 text-2xl">Patient</label>
+                            <div className="flex flex-row items-center bg-green-300 mt-6">
+                                <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">
+                                    Patient
+                                </label> <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
                             </div>
-                            <div className="bg-[#e8e8e8] mt-2">
-                                <label className="block ml-2 text-xl">ID:</label>
-                                <label className="block ml-2 text-xl">Name:</label>
-                                <label className="block ml-2 text-xl">Gender:</label>
-                                <label className="block ml-2 text-xl">Birthday:</label>
+                            <div className="bg-green-50">
+                                <div className="p-1.5">
+                                    {/*00100020,LO => 123456*/}
+                                    <span className="block ml-2 text-lg mt-2 "><span
+                                        className="font-bold">ID : </span>{patientID}</span>
+                                    {/*00100010,PN => Philips^Amy*/}
+                                    <span className="block ml-2 text-lg mt-2"><span
+                                        className="font-bold">Name : </span>{patientName}</span>
+                                    {/*00100040,CS => O*/}
+                                    <span className="block ml-2 text-lg mt-2"><span
+                                        className="font-bold">Gender : </span>{patientSex}</span>
+                                    {/*00100030,DA => 20010101*/}
+                                    <span className="block ml-2 text-lg mt-2 mb-4"><span className="font-bold">Birthday : </span>{patientBirthDate}</span>
+                                </div>
                             </div>
-                            <div>
-                                <label className="ml-2 text-2xl mt-2">Case</label>
+                            <div className="flex flex-row items-center bg-green-300 mt-6">
+                                <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">Case</label>
+                                <Icon icon="fluent:document-data-16-filled" width="28" height="28" className="ml-3 text-white"/>
                             </div>
-                            <div className="bg-[#e8e8e8] mt-2">
-                                <label className="block ml-2 text-xl">Accession:</label>
-                                <label className="block ml-2 text-xl">ID:</label>
-                                <label className="block ml-2 text-xl">Date:</label>
-                                <label className="block ml-2 text-xl">Time:</label>
+                            <div className="bg-green-50">
+                                <div className="p-1.5">
+                                    {/*00080050,SH => D18-1001*/}
+                                    <span className="block ml-2 text-lg mt-2"><span
+                                        className="font-bold">Accession : </span>{accessionNumber2}</span>
+                                    <span className="block ml-2 text-lg mt-2"><span
+                                        className="font-bold">ID : </span></span>
+                                    {/*00080020,DA => 20181003 */}
+                                    <span className="block ml-2 text-lg mt-2"><span
+                                        className="font-bold">Date : </span>{studyDate}</span>
+                                    <span className="block ml-2 text-lg mt-2 mb-4"><span
+                                        className="font-bold">Time : </span>{StudyTime}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -614,7 +691,7 @@ function MicroscopyViewer(props) {
 
             )}
 
-            <div className="w-100 h-100 flex text-center" id={viewerID}></div>
+            <div className="w-100 h-100 flex text-center border-4 border-red-500" id={viewerID}></div>
             {isRightOpen ? (
                 <div className="flex flex-row w-96">
 

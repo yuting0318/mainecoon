@@ -2,7 +2,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "Hook";
 import _ from "lodash";
 
-import { firstQuery, queryParameter, updateQueryParameter, initialLimitAndOffset } from "Slices/searchAreaSlice/searchAreaSlice";
+import { firstQuery, queryParameter, updateQueryParameter, initialLimitAndOffset } from "../../slices/searchAreaSlice/searchAreaSlice";
 
 
 const QueryParameter_PatientID: React.FC = () => {

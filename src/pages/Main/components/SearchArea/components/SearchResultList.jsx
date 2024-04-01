@@ -1,15 +1,11 @@
-import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from "Hook";
-
 import _ from "lodash";
-
 import { updateQueryParameter, firstQuery, getNextTenResult } from "Slices/searchAreaSlice/searchAreaSlice";
-import { SearchResult } from './SearchResult';
+import SearchResult from "./SearchResult";
 
-const SearchResultList: React.FC = () => {
-
-    const searchResultListRef = useRef<HTMLDivElement>(null);
+const SearchResultList = () => {
+    const searchResultListRef = useRef();
 
     const searchAreaReducer = useAppSelector((state) => state.searchAreaSlice);
     const queryParameter = searchAreaReducer.parameter;
@@ -27,31 +23,22 @@ const SearchResultList: React.FC = () => {
             // 卷軸觸底行為
             if (scrollTop + clientHeight === scrollHeight) {
                 // 下一階段查詢 不是空的才查詢
-                if (isNextQueryEmpty != true) {
+                if (!isNextQueryEmpty) {
                     dispatch(getNextTenResult(queryParameter));
                 }
-
             }
         }
     }
 
-    return <>
-        {/*畫面左邊下面*/}
-        <div className="flex-fill overflow-y-auto overflow-x-hidden h-0 " onScroll={onScroll} ref={searchResultListRef}>
-            {
-                results.map((result) => {
-                    return <>
-                        <SearchResult
-                            qidorsSingleStudy={result}
-                        />
-                    </>
-                })
-            }
+    return (
+        //  overflow-y-auto overflow-x-hidden
+        <div className="flex-fill h-0 overflow-y-auto overflow-x-hidden" onScroll={onScroll} ref={searchResultListRef}
+             style={{scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
+            {results.map((result) => (
+                <SearchResult key={result.id} qidorsSingleStudy={result}/>
+            ))}
         </div>
-    </>
-}
+    );
+};
 
-
-
-
-export { SearchResultList }
+export {SearchResultList};
