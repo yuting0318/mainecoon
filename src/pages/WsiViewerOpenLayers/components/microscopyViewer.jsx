@@ -98,7 +98,8 @@ function MicroscopyViewer(props) {
     const [newAnnAccession, setNewAnnAccession] = useState(false);
     const [accessionNumber, setAccessionNumber] = useState('');
 
-
+    // Keeps of the order in which shapes are drawn
+    const drawnShapesStack = useRef([]);
 
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
@@ -228,6 +229,7 @@ function MicroscopyViewer(props) {
 
         if (!isDrawingEllipse && ellipsePreview) {
             savedEllipsesSourceRef.current.addFeature(new Feature(ellipsePreview.getGeometry())); // 將橢圓添加到保存圖層
+            drawnShapesStack.current.push('ELLIPSE');
             ellipsePreview.setGeometry(null); // 清除預覽圖層中的橢圓
             sourceRef.current.removeFeature(ellipsePreview); // 從原來的圖層中移除
             setEllipsePreview(null); // 重置預覽Feature
@@ -273,6 +275,7 @@ function MicroscopyViewer(props) {
         }
         if (!isDrawingRectangle && rectanglePreview) {
             savedRectangleSourceRef.current.addFeature(new Feature(rectanglePreview.getGeometry())); // 將橢圓添加到保存圖層
+            drawnShapesStack.current.push('RECTANGLE');
             rectanglePreview.setGeometry(null); // 清除預覽圖層中的橢圓
             sourceRef.current.removeFeature(rectanglePreview); // 從原來的圖層中移除
             setRectanglePreview(null); // 重置預覽Feature
@@ -320,6 +323,7 @@ function MicroscopyViewer(props) {
 
             // 添加新的绘图交互到地图上
             mapRef.current.addInteraction(drawInteraction);
+            drawnShapesStack.current.push(type);
             drawInteractionRef.current = drawInteraction;
         }
     };
@@ -340,10 +344,27 @@ function MicroscopyViewer(props) {
     }
 
     function undoFeature() {
-        const features = sourceRef.current.getFeatures();
-        if (features.length > 0) {
-            const lastFeature = features[features.length - 1];
-            sourceRef.current.removeFeature(lastFeature);
+        let features = sourceRef.current.getFeatures();
+        switch (drawnShapesStack.current.pop()) {
+            case 'ELLIPSE':
+                features = savedEllipsesSourceRef.current.getFeatures();
+                if (features.length > 0) {
+                    const lastFeature = features[features.length - 1];
+                    savedEllipsesSourceRef.current.removeFeature(lastFeature);
+                }
+                break;
+            case 'RECTANGLE':
+                features = savedRectangleSourceRef.current.getFeatures();
+                if (features.length > 0) {
+                    const lastFeature = features[features.length - 1];
+                    savedRectangleSourceRef.current.removeFeature(lastFeature);
+                }
+                break;
+            default:
+                if (features.length > 0) {
+                    const lastFeature = features[features.length - 1];
+                    sourceRef.current.removeFeature(lastFeature);
+                }
         }
     }
 
