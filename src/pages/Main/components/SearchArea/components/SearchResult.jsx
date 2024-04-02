@@ -48,7 +48,7 @@ const SearchResult = ({ qidorsSingleStudy }) => {
     }
 
     function getQidorsSingleStudyMetadataValue(qidorsSingleStudy, metadataTag, defaultValue) {
-        console.log("~~~~~~~~~~~~~~~~~~~~~qidorsSingleStudy", qidorsSingleStudy)
+        // console.log("~~~~~~~~~~~~~~~~~~~~~qidorsSingleStudy", qidorsSingleStudy)
         return _.isUndefined(_.first(_.get(qidorsSingleStudy, metadataTag).Value)) ? defaultValue : _.first(_.get(qidorsSingleStudy, metadataTag).Value);
     }
 
@@ -58,13 +58,13 @@ const SearchResult = ({ qidorsSingleStudy }) => {
     const patientSex= getQidorsSingleStudyMetadataValue(qidorsSingleStudy, QIDO_RS_Response.PatientSex, "PatientSex NotFound");
     const accessionNumber= getQidorsSingleStudyMetadataValue(qidorsSingleStudy, QIDO_RS_Response.AccessionNumber, "AccessionNumber NotFound");
     const studyDate= getQidorsSingleStudyMetadataValue(qidorsSingleStudy, QIDO_RS_Response.StudyDate, "StudyDate NotFound");
-
-    console.log("patientID", patientID)
-    console.log("patientName", patientName)
-    console.log("patientBirthDate", patientBirthDate)
-    console.log("patientSex", patientSex)
-    console.log("accessionNumber", accessionNumber)
-    console.log("studyDate", studyDate)
+    //
+    // console.log("patientID", patientID)
+    // console.log("patientName", patientName)
+    // console.log("patientBirthDate", patientBirthDate)
+    // console.log("patientSex", patientSex)
+    // console.log("accessionNumber", accessionNumber)
+    // console.log("studyDate", studyDate)
 
     // 畫面左邊下面的每一筆資料
     return (

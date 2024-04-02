@@ -2,7 +2,8 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "Hook";
 import _ from "lodash";
 import { firstQuery, updateQueryParameter, initialLimitAndOffset } from "../../../../../../../slices/searchAreaSlice/searchAreaSlice";
-const QueryParameter_PatientID = () => {
+
+const QueryParameter_PatientID = ({setIsMouseOn}) => {
     const searchAreaReducer = useAppSelector((state) => state.searchAreaSlice);
     const queryParameter = searchAreaReducer.parameter;
 
@@ -13,6 +14,7 @@ const QueryParameter_PatientID = () => {
     const searchBtnOnClick = () => {
         dispatch(initialLimitAndOffset());
         dispatch(firstQuery(queryParameter));
+        setIsMouseOn(false);
     };
 
     return (

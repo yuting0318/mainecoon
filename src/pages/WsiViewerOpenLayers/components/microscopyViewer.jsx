@@ -125,8 +125,6 @@ function MicroscopyViewer(props) {
         const totalPixelMatrixRows = _.first(_.get(_.get(bigestInstanceMetadata, "00480007"), "Value"));
         const extent = [0, 0, totalPixelMatrixColumns, totalPixelMatrixRows];
 
-        console.log('minLevel',minLevel)
-        console.log('maxLevel',maxLevel)
         const dicomProjection = new Projection({
             code: 'DICOM',
             units: 'pixels',
@@ -138,25 +136,24 @@ function MicroscopyViewer(props) {
                 const z = tileCoord[0];
                 const x = tileCoord[1];
                 const y = tileCoord[2];
-                console.log('x,y,z',x,y,z)
                 const currentInstance = Instances[z]; // 當前的 Instance
                 const currentInstanceMetadata = _.get(currentInstance, "metadata"); // 當前 Instance 的 Metadata
-
-                const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value")); // 00480006 總寬 TotalPixelMatrixColumns
+                console.log('extent',extent)
+                // const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value")); // 00480006 總寬 TotalPixelMatrixColumns
+                const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value"));
                 const currentInstanceSingleImageWidth = _.first(_.get(_.get(currentInstanceMetadata, "00280011"), "Value")); // 每張小圖的寬
+                // const widthImageCount = Math.ceil(currentInstanceTotalPixelMatrixColumns / currentInstanceSingleImageWidth); // 寬度部分要擺多少張
                 const widthImageCount = Math.ceil(currentInstanceTotalPixelMatrixColumns / currentInstanceSingleImageWidth); // 寬度部分要擺多少張
                 const index = x + y * widthImageCount // 計算 Index
-                console.log('index',index)
 
-                console.log('currentInstanceTotalPixelMatrixColumns',currentInstanceTotalPixelMatrixColumns)
 
                 const queryMode = _.get(currentInstance, "queryMode");
                 const frames = _.get(currentInstance, "Frames");
 
                 const specificFrameObject = _.get(frames, index);
                 const url = _.get(_.get(_.get(specificFrameObject, "url"), queryMode), "rendered");
-
-
+                console.log('specificFrameObject',specificFrameObject)
+                console.log('dicomProjection',dicomProjection)
                 return url;
             },
             maxZoom: maxLevel,
@@ -165,6 +162,8 @@ function MicroscopyViewer(props) {
             wrapX: false,
             interpolate: false,
         });
+
+
         const savedEllipsesLayer = new VectorLayer({
             source: savedEllipsesSourceRef.current,
         });
@@ -181,7 +180,7 @@ function MicroscopyViewer(props) {
             projection: dicomProjection,
             extent: extent,
         });
-
+        console.log('view',view)
         const vector = new VectorLayer({source: sourceRef.current});
         const layers = [wsiLayer, ...annVectorLayers, vector, savedEllipsesLayer, savedRectangleLayer];
         const mousePositionControl = new MousePosition({
@@ -577,7 +576,7 @@ function MicroscopyViewer(props) {
     }, []);
 
     const [data, setData] = useState([]);
-    // 確認studyInstanceUID是否有值(問!!!!!!!!!!!!!!!)
+    // 確認studyInstanceUID是否有值(?!!!!!!!!!!!!!!!)
     const fetchDetails = async() => {
         try{
             const response = await fetch(`https://ditto.dicom.tw/dicom-web/studies?ModalitiesInStudy=SM&StudyInstanceUID=${studyInstanceUID}`);
@@ -705,71 +704,71 @@ function MicroscopyViewer(props) {
                         <div className="!h-100  w-96 overflow-auto ">
 
                             {/*<div className="!h-[100rem] ">*/}
-                                <div className={`flex flex-column w-full border-end `}>
+                            <div className={`flex flex-column w-full border-end `}>
 
-                                    <div className="flex flex-row items-center bg-green-300 mt-2 justify-content-between">
-                                        <div className="flex items-center">
-                                            <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 flex items-center">
-                                                Patient
-                                                <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
-                                            </label>
-                                        </div>
+                                <div className="flex flex-row items-center bg-green-300 mt-2 justify-content-between">
+                                    <div className="flex items-center">
+                                        <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 flex items-center">
+                                            Patient
+                                            <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
+                                        </label>
+                                    </div>
 
-                                        <div className="bg-opacity-100 flex justify-end items-end z-30 ">
-                                            <button
-                                                className="flex items-center bg-gray-400 hover:bg-gray-600 text-white font-bold rounded-l-lg p-3"
-                                                onClick={LeftDrawer}>
-                                                {'<<'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="bg-green-50">
-                                        <div className="p-1.5">
-                                            {/*00100020,LO => 123456*/}
-                                            <span className="block ml-2 text-lg mt-2 "><span
-                                                className="font-bold">ID : </span>{patientID}</span>
-                                            {/*00100010,PN => Philips^Amy*/}
-                                            <span className="block ml-2 text-lg mt-2"><span
-                                                className="font-bold">Name : </span>{patientName}</span>
-                                            {/*00100040,CS => O*/}
-                                            <span className="block ml-2 text-lg mt-2"><span
-                                                className="font-bold">Gender : </span>{patientSex}</span>
-                                            {/*00100030,DA => 20010101*/}
-                                            <span className="block ml-2 text-lg mt-2 mb-4"><span className="font-bold">Birthday : </span>{patientBirthDate}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-row items-center bg-green-300 mt-6">
-                                        <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">Case</label>
-                                        <Icon icon="fluent:document-data-16-filled" width="28" height="28" className="ml-3 text-white"/>
-                                    </div>
-                                    <div className="bg-green-50">
-                                        <div className="p-1.5">
-                                            {/*00080050,SH => D18-1001*/}
-                                            <span className="block ml-2 text-lg mt-2"><span
-                                                className="font-bold">Accession : </span>{accessionNumber2}</span>
-                                            <span className="block ml-2 text-lg mt-2"><span
-                                                className="font-bold">ID : </span></span>
-                                            {/*00080020,DA => 20181003 */}
-                                            <span className="block ml-2 text-lg mt-2"><span
-                                                className="font-bold">Date : </span>{studyDate}</span>
-                                            <span className="block ml-2 text-lg mt-2 mb-4"><span
-                                                className="font-bold">Time : </span>{StudyTime}</span>
-                                        </div>
-                                    </div>
-                                    <div className="mt-2">
-                                        <label className="ml-2 text-2xl ">SlideLabel</label>
-                                    </div>
-                                    <div className="bg-[#e8e8e8] mt-2">
-                                        <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
-                                        <p className="block ml-2 text-xl">BarcodeValue:</p>
-                                    </div>
-                                    <div>
-                                        <label className="ml-2 text-2xl">Specimens</label>
-                                    </div>
-                                    <div className="bg-[#e8e8e8] mt-2 text-xl ">
-                                        <p className="ml-2">AnatomicStructure:</p>
+                                    <div className="bg-opacity-100 flex justify-end items-end z-30 ">
+                                        <button
+                                            className="flex items-center bg-gray-400 hover:bg-gray-600 text-white font-bold rounded-l-lg p-3"
+                                            onClick={LeftDrawer}>
+                                            {'<<'}
+                                        </button>
                                     </div>
                                 </div>
+                                <div className="bg-green-50">
+                                    <div className="p-1.5">
+                                        {/*00100020,LO => 123456*/}
+                                        <span className="block ml-2 text-lg mt-2 "><span
+                                            className="font-bold">ID : </span>{patientID}</span>
+                                        {/*00100010,PN => Philips^Amy*/}
+                                        <span className="block ml-2 text-lg mt-2"><span
+                                            className="font-bold">Name : </span>{patientName}</span>
+                                        {/*00100040,CS => O*/}
+                                        <span className="block ml-2 text-lg mt-2"><span
+                                            className="font-bold">Gender : </span>{patientSex}</span>
+                                        {/*00100030,DA => 20010101*/}
+                                        <span className="block ml-2 text-lg mt-2 mb-4"><span className="font-bold">Birthday : </span>{patientBirthDate}</span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-row items-center bg-green-300 mt-6">
+                                    <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">Case</label>
+                                    <Icon icon="fluent:document-data-16-filled" width="28" height="28" className="ml-3 text-white"/>
+                                </div>
+                                <div className="bg-green-50">
+                                    <div className="p-1.5">
+                                        {/*00080050,SH => D18-1001*/}
+                                        <span className="block ml-2 text-lg mt-2"><span
+                                            className="font-bold">Accession : </span>{accessionNumber2}</span>
+                                        <span className="block ml-2 text-lg mt-2"><span
+                                            className="font-bold">ID : </span></span>
+                                        {/*00080020,DA => 20181003 */}
+                                        <span className="block ml-2 text-lg mt-2"><span
+                                            className="font-bold">Date : </span>{studyDate}</span>
+                                        <span className="block ml-2 text-lg mt-2 mb-4"><span
+                                            className="font-bold">Time : </span>{StudyTime}</span>
+                                    </div>
+                                </div>
+                                <div className="mt-2">
+                                    <label className="ml-2 text-2xl ">SlideLabel</label>
+                                </div>
+                                <div className="bg-[#e8e8e8] mt-2">
+                                    <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
+                                    <p className="block ml-2 text-xl">BarcodeValue:</p>
+                                </div>
+                                <div>
+                                    <label className="ml-2 text-2xl">Specimens</label>
+                                </div>
+                                <div className="bg-[#e8e8e8] mt-2 text-xl ">
+                                    <p className="ml-2">AnatomicStructure:</p>
+                                </div>
+                            </div>
                             {/*</div>*/}
 
 
@@ -799,163 +798,23 @@ function MicroscopyViewer(props) {
 
 
 
-            {/*{isRightOpen ? (*/}
-            {/*    <div className="flex flex-row w-96">*/}
 
-            {/*        <div className="flex flex-column w-full border-start">*/}
-
-            {/*            <div className="bg-opacity-100 flex justify-start items-end mt-2">*/}
-            {/*                <button*/}
-            {/*                    className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg p-3"*/}
-            {/*                    onClick={RightDrawer}>*/}
-            {/*                    {'>>'}*/}
-            {/*                </button>*/}
-
-            {/*            </div>*/}
-            {/*            <div className="mt-2">*/}
-            {/*                <label className="ml-2 text-2xl ">SlideLabel</label>*/}
-            {/*            </div>*/}
-            {/*            <div className="bg-[#e8e8e8] mt-2">*/}
-            {/*                <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>*/}
-            {/*                <p className="block ml-2 text-xl">BarcodeValue:</p>*/}
-            {/*            </div>*/}
-            {/*            <div>*/}
-            {/*                <label className="ml-2 text-2xl">Specimens</label>*/}
-            {/*            </div>*/}
-            {/*            <div className="bg-[#e8e8e8] mt-2 text-xl ">*/}
-            {/*                <p className="ml-2">AnatomicStructure:</p>*/}
-            {/*            </div>*/}
-
-            {/*            <div className="flex items-center ml-1 mt-3">*/}
-
-            {/*                <button*/}
-            {/*                    className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${*/}
-            {/*                        newAnnSeries ? 'bg-green-400' : 'bg-gray-300'*/}
-            {/*                    }`}*/}
-            {/*                    onClick={toggleSwitch}*/}
-            {/*                >*/}
-            {/*                <span*/}
-            {/*                    className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${*/}
-            {/*                        newAnnSeries ? 'translate-x-full' : ''}`}/>*/}
-            {/*                </button>*/}
-            {/*                /!*<span className="ml-2 text-gray-600">{newAnnSeries ? 'ON' : 'OFF'}</span>*!/*/}
-            {/*                <label className="ml-3 text-2xl " >NewAnnSeries</label>*/}
-
-            {/*            </div>*/}
-            {/*            <div className="ml-1">*/}
-
-            {/*                <button*/}
-            {/*                    className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${*/}
-            {/*                        newAnnAccession ? 'bg-green-400' : 'bg-gray-300'*/}
-            {/*                    }`}*/}
-            {/*                    onClick={toggleSwitch1}*/}
-            {/*                >*/}
-            {/*                <span*/}
-            {/*                    className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${*/}
-            {/*                        newAnnAccession ? 'translate-x-full' : ''}`}/>*/}
-            {/*                </button>*/}
-            {/*                /!*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*!/*/}
-            {/*                <label  className="ml-3 text-2xl ">NewAnnAccession</label>*/}
-
-            {/*                {newAnnAccession && (*/}
-            {/*                    <input*/}
-            {/*                        type="text"*/}
-            {/*                        placeholder="Accession Number"*/}
-            {/*                        value={accessionNumber}*/}
-            {/*                        className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"*/}
-            {/*                        onChange={(e) => setAccessionNumber(e.target.value)}*/}
-            {/*                    />*/}
-            {/*                )}*/}
-            {/*            </div>*/}
-
-            {/*            <div className="text-center mt-2">*/}
-            {/*                <h5 className="font-bold text-xl my-2">手動標記專區 (ANN/SEG) </h5>*/}
-            {/*                <button className=" bg-gray-300 rounded-lg p-2.5 mr-2 "*/}
-            {/*                        onClick={() => updateDrawType('Point')}>*/}
-            {/*                    <Icon icon="tabler:point-filled" className=""/></button>*/}
-            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
-            {/*                        onClick={() => updateDrawType('LineString')}>*/}
-            {/*                    <Icon icon="material-symbols-light:polyline-outline" className=""/></button>*/}
-            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
-            {/*                        onClick={() => updateDrawType('Polygon')}>*/}
-            {/*                    <Icon icon="ph:polygon" className=""/></button>*/}
-            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
-            {/*                        onClick={() => updateDrawType('Rectangle')}>*/}
-            {/*                    <Icon icon="f7:rectangle" className=""/></button>*/}
-            {/*                <button className="bg-gray-300 rounded-lg p-2.5 mr-2"*/}
-            {/*                        onClick={() => updateDrawType('Ellipse')}>*/}
-            {/*                    <Icon icon="mdi:ellipse-outline" className=""/></button>*/}
-            {/*            </div>*/}
-
-
-            {/*            <div className="flex justify-evenly">*/}
-            {/*                <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"*/}
-            {/*                        onClick={saveAnnotations}>儲存標記*/}
-            {/*                </button>*/}
-
-            {/*                <button*/}
-            {/*                    className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3"*/}
-            {/*                    onClick={undoFeature}*/}
-            {/*                >復原*/}
-            {/*                </button>*/}
-            {/*                /!* TODO *!/*/}
-            {/*                /!*<button*!/*/}
-            {/*                /!*    className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3">取消復原*!/*/}
-            {/*                /!*</button>*!/*/}
-            {/*            </div>*/}
-
-            {/*            /!*<div className="text-center">*!/*/}
-            {/*            /!*    <button className="bg-gray-300 rounded-lg p-2.5 mt-2"*!/*/}
-            {/*            /!*            onClick={() => updateDrawType('Ellipse')}>*!/*/}
-            {/*            /!*        <Icon icon="bx:screenshot" className=""/></button>*!/*/}
-            {/*            /!*</div>*!/*/}
-
-            {/*            /!*<div className="text-center mt-3">*!/*/}
-            {/*            /!*    <h5 className="font-bold my-2 text-xl">模型輔助標記 </h5>*!/*/}
-            {/*            /!*    <button className="mx-2 bg-[#00c472] p-2 text-white rounded-3"*!/*/}
-            {/*            /!*            onClick={() => updateDrawType('Point')}>啟動*!/*/}
-            {/*            /!*    </button>*!/*/}
-            {/*            /!*    <button className=" mx-2 bg-[#d40000] p-2 text-white rounded-3"*!/*/}
-            {/*            /!*            onClick={() => updateDrawType('LineString')}>關閉*!/*/}
-            {/*            /!*    </button>*!/*/}
-            {/*            /!*    <button className="bg-[#0073ff] mx-2 p-2 text-white rounded-3" onClick={saveAnnotations}>儲存*!/*/}
-            {/*            /!*    </button>*!/*/}
-            {/*            /!*</div>*!/*/}
-
-
-
-
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*) : (*/}
-            {/*    <>*/}
-            {/*        <div className="bg-opacity-0 flex flex-column justify-start items-end mt-60 gap-10">*/}
-            {/*            <div className="bg-opacity-0 flex ">*/}
-            {/*                <button*/}
-            {/*                    className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg px-2 py-5"*/}
-            {/*                    onClick={RightDrawer}>*/}
-            {/*                    {'<'}*/}
-            {/*                </button>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </>*/}
-            {/*)}*/}
 
             <Modal isOpen={isStuModalOpen} onClose={closeModal}>
                 <div className="mt-2">
                     <div className="flex items-center ml-1 ">
-                    <button
-                        className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 border-2 border-gray-200  ${
-                            newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
-                        }`}
-                        onClick={toggleSwitch1}
-                    >
+                        <button
+                            className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 border-2 border-gray-200  ${
+                                newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
+                            }`}
+                            onClick={toggleSwitch1}
+                        >
                             <span
-                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                                className={`absolute left-1 top-0.5 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
                                     newAnnAccession ? 'translate-x-full' : ''}`}/>
-                    </button>
-                    {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
-                    <label  className="ml-3 text-xl ">NewAnnAccession</label>
+                        </button>
+                        {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
+                        <label  className="ml-3 text-xl ">NewAnnAccession</label>
                     </div>
 
                     {newAnnAccession && (

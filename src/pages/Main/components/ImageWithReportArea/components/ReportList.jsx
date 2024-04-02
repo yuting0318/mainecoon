@@ -3,6 +3,7 @@ import {useAppSelector} from "Hook";
 
 import _ from "lodash";
 import Modal from "./Modal";
+import {Icon} from "@iconify/react";
 
 
 const ReportList = () => {
@@ -44,6 +45,10 @@ const ReportList = () => {
             {/*}*/}
             {reportResults && (
                 <>
+                    <div className="text-green-500 flex flex-row">
+                        <Icon icon="tabler:report-medical" width="32" height="32" className="ml-2 mr-2"/>
+                        <span id="report" className="ml-2 text-green-500 text-2xl font-bold ">Reports</span>
+                    </div>
                     <button onClick={handleOpenReport}>
                         <div className="ml-10 mt-3 w-52 border-4 rounded-lg border-green-500">
                             <div className=" border-b-2 border-green-500 ">

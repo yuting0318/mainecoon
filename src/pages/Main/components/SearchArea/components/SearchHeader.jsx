@@ -17,9 +17,12 @@ const SearchHeader = () => {
         setIsMouseOn(false);
     };
 
+    const myRef = useRef(null);
+    useOutsideClick(myRef, () => {mouseOutFun()});
+
     return (
-        <div className="" onMouseOver={mouseOnFun}>
-            <SearchHeaderLiteMode />
+        <div ref={myRef} className="" onMouseOver={mouseOnFun}>
+            <SearchHeaderLiteMode setIsMouseOn={setIsMouseOn}/>
             {isMouseOn && <SearchHeaderExpandMode onMouseHoverHandler={mouseOutFun} />}
         </div>
     );
@@ -42,16 +45,35 @@ const SearchHeaderExpandMode = ({onMouseHoverHandler}) => {
     );
 };
 
-const SearchHeaderLiteMode = () => {
+const SearchHeaderLiteMode = ({setIsMouseOn}) => {
     return (
         <div className="bg-auto border-bottom m-2 ">
             <div className="">
                 <div className="flex flex-fill flex-column">
-                    <QueryParameter_PatientID />
+                    <QueryParameter_PatientID setIsMouseOn={setIsMouseOn} />
                 </div>
             </div>
         </div>
     );
+};
+
+import { useEffect, useRef } from 'react';
+
+export const useOutsideClick = (ref, callback) => {
+    useEffect(() => {
+        const handleClickOutside = event => {
+            if (ref.current && !ref.current.contains(event.target)) {
+                callback(event);
+                // ref.current.dispatchEvent(new CustomEvent('click-outside'));
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [ref, callback]);
 };
 
 export { SearchHeader };

@@ -11,9 +11,9 @@ const ImageResultList = () => {
     const isLoading = _.isEqual(imageWithReportSlice.imageResultStatus, "Loading");
 
     return (
-        <div className="overflow-y-auto xl:h-[560px]" style={{scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
+        <div className="" style={{scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
             {!isLoading && (
-                <div className={`grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-1`}>
+                <div className={`grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-1 p-3`}>
                     {seriesResults?.map((seriesResult, index) => (
                         <ImageResult key={index} wadoSingleSeries={seriesResult} />
                     ))}

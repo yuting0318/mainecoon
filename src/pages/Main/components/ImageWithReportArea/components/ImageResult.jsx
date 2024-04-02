@@ -45,7 +45,7 @@ const ImageResult = ({wadoSingleSeries}) => {
 
     return <>
         <div className="mt-4 ">
-            <div className="w-52 mb-2 h-56 border border-4 rounded-lg shadow-xl shadow-gray-400" key="{seriesInstanceUID}" onClick={OnClick}>
+            <div className="w-52 mb-2 h-56 border-4 rounded-lg shadow-xl shadow-gray-400" key="{seriesInstanceUID}" onClick={OnClick}>
                 {// 將SM和ANN的內容放在同一個div內
                     (_.isEqual(_.first(modalityAttribute), "SM") || _.isEqual(_.first(modalityAttribute), "ANN")) && (
                         <div className="">
