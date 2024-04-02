@@ -8,6 +8,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import { Coordinate, createStringXY } from 'ol/coordinate';
+import {multipartDecode} from "../pages/WsiViewerOpenLayers/components/Message";
 
 // 整理 ANN
 const convertAnnotation = createAsyncThunk(
@@ -47,7 +48,6 @@ const convertAnnotation = createAsyncThunk(
                 })
             })
 
-
             // 可能有多次 ANN 的結果 (instance)
             const metadatas = singleAnnotaionSeries.metadata;
 
@@ -66,7 +66,17 @@ const convertAnnotation = createAsyncThunk(
                 for (let k = 0; k < annotationGroupSequence.length; k++) {
                     const singleAnnotationGroup = annotationGroupSequence[k] as {};
                     const graphicType = _.first(getMetadataValue(singleAnnotationGroup, "00700023") as []) as string; // 00700023 (Point、Open Polylines、Closed Polygons、Circles、Ellipses、Squares、Rectangles)
-                    const pointCoordinatesData = getOFDICOMMetadataValuesFromBase64(getMetadataValue(singleAnnotationGroup, "00660016") as string); // 00660016
+                    let metadataValue = singleAnnotationGroup["00660016" as never];
+
+                    let pointCoordinatesData;
+
+                    if (Object.prototype.hasOwnProperty.call(metadataValue, "BulkDataURI")) {
+                        let response = await fetch(metadataValue["BulkDataURI"]);
+                        pointCoordinatesData = new Float32Array(multipartDecode(await response.arrayBuffer())[0]);
+                    } else {
+                        pointCoordinatesData = getOFDICOMMetadataValuesFromBase64(getMetadataValue(singleAnnotationGroup, "00660016") as string); // 00660016
+                    }
+
                     const doublePointCoordinatesData = _.first(getMetadataValue(singleAnnotationGroup, "00660022") as []); // 00660022
                     const numberofAnnotations = _.first(getMetadataValue(singleAnnotationGroup, "006A000C") as []); // 006A000C
                     const longPrimitivePointIndexList = getMetadataValue(singleAnnotationGroup, "00660040") as string; // 00660040 Required if Graphic Type (0070,0023) is POLYLINE or POLYGON.    
