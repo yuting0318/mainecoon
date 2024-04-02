@@ -21,6 +21,7 @@ import {toast} from 'react-toastify';
 import Circle from 'ol/geom/Circle';
 import {QIDO_RS_Response} from "Slices/searchAreaSlice/components/enums/QIDO_RS_Response";
 import {querySeries} from "Slices/imageWithReportSlice/imageWithReportSlice";
+import Modal from "./Modal";
 
 function calculateExtremityPoints(coordinates) {
     const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
@@ -322,7 +323,6 @@ function MicroscopyViewer(props) {
         } else if (type === 'Rectangle') {
             setIsDrawingRectangle(true);
         } else {
-            // 为其他绘图类型创建 Draw 交互
             const drawInteraction = new Draw({
                 source: sourceRef.current,
                 type: type, // 使用选定的绘图类型
@@ -627,6 +627,15 @@ function MicroscopyViewer(props) {
     }
 
 
+    const [isStuModalOpen, setIsStuModalOpen] = useState(false);
+    const openStuModal = () => {
+        setIsStuModalOpen(true);
+    };
+    const closeModal = () => {
+        setIsStuModalOpen(false);
+        setNewAnnAccession(false);
+    };
+
 
     return (
         <>
@@ -715,53 +724,34 @@ function MicroscopyViewer(props) {
 
             <div className="w-100 h-100 flex flex-col text-center" id={viewerID}>
                 <div className="flex flex-row justify-between m-2 gap-2 border-b-2">
-                <button className="bg-yellow-200   rounded-lg p-2.5 mr-2 mb-2 "
-                        onClick={() => updateDrawType('POINT')}>
-                    <Icon icon="tabler:point-filled" className="text-black"/>
-                </button>
-                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                        onClick={() => updateDrawType('POLYLINE')}>
-                    <Icon icon="material-symbols-light:polyline-outline" className="text-black"/>
-                </button>
-                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                        onClick={() => updateDrawType('POLYGON')}>
-                    <Icon icon="ph:polygon" className="text-black"/></button>
-                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                        onClick={() => updateDrawType('RECTANGLE')}>
-                    <Icon icon="f7:rectangle" className="text-black"/></button>
-                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                        onClick={() => updateDrawType('ELLIPSE')}>
-                    <Icon icon="mdi:ellipse-outline" className="text-black"/></button>
-                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                        onClick={() => updateDrawType('ELLIPSE')}>
-                    <Icon icon="bx:screenshot" className="text-black"/></button>
-
-                    <div className="mt-2">
-                    <button
-                        className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 ${
-                            newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
-                        }`}
-                        onClick={toggleSwitch1}
-                    >
-                            <span
-                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                                    newAnnAccession ? 'translate-x-full' : ''}`}/>
-                    </button>
-                    {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
-                    <label  className="ml-3 text-xs">NewAnnAccession</label>
-
-                    {newAnnAccession && (
-                        <input
-                            type="text"
-                            placeholder="Accession Number"
-                            value={accessionNumber}
-                            className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"
-                            onChange={(e) => setAccessionNumber(e.target.value)}
-                        />
-                    )}
+                    <div className="m-2">
+                        <button className=" mr-6  "
+                                onClick={() => openStuModal()}>
+                            <Icon icon="fluent:list-28-filled" className="text-black h-5 w-5"/>
+                        </button>
+                        <button className=" bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2 "
+                                onClick={() => updateDrawType('Point')}>
+                            <Icon icon="tabler:point-filled" className="text-black"/></button>
+                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                                onClick={() => updateDrawType('LineString')}>
+                            <Icon icon="material-symbols-light:polyline-outline" className="text-black"/></button>
+                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                                onClick={() => updateDrawType('Polygon')}>
+                            <Icon icon="ph:polygon" className="text-black"/></button>
+                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                                onClick={() => updateDrawType('Rectangle')}>
+                            <Icon icon="f7:rectangle" className="text-black"/></button>
+                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                                onClick={() => updateDrawType('Ellipse')}>
+                            <Icon icon="mdi:ellipse-outline" className="text-black"/></button>
+                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
+                                onClick={() => updateDrawType('ELLIPSE')}>
+                            <Icon icon="bx:screenshot" className="text-black"/></button>
                     </div>
-                    <div className="justify-end flex">
-                    <button className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2"
+
+
+                    <div className="justify-end flex mb-2">
+                    <button className="bg-[#0073ff] w-24 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2"
                             onClick={saveAnnotations}>儲存標記
                     </button>
 
@@ -831,15 +821,15 @@ function MicroscopyViewer(props) {
             {/*                /!*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*!/*/}
             {/*                <label  className="ml-3 text-2xl ">NewAnnAccession</label>*/}
 
-                            {/*{newAnnAccession && (*/}
-                            {/*    <input*/}
-                            {/*        type="text"*/}
-                            {/*        placeholder="Accession Number"*/}
-                            {/*        value={accessionNumber}*/}
-                            {/*        className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"*/}
-                            {/*        onChange={(e) => setAccessionNumber(e.target.value)}*/}
-                            {/*    />*/}
-                            {/*)}*/}
+            {/*                {newAnnAccession && (*/}
+            {/*                    <input*/}
+            {/*                        type="text"*/}
+            {/*                        placeholder="Accession Number"*/}
+            {/*                        value={accessionNumber}*/}
+            {/*                        className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-1.5"*/}
+            {/*                        onChange={(e) => setAccessionNumber(e.target.value)}*/}
+            {/*                    />*/}
+            {/*                )}*/}
             {/*            </div>*/}
 
             {/*            <div className="text-center mt-2">*/}
@@ -897,6 +887,8 @@ function MicroscopyViewer(props) {
             {/*            /!*</div>*!/*/}
 
 
+
+
             {/*        </div>*/}
             {/*    </div>*/}
             {/*) : (*/}
@@ -912,6 +904,35 @@ function MicroscopyViewer(props) {
             {/*        </div>*/}
             {/*    </>*/}
             {/*)}*/}
+
+            <Modal isOpen={isStuModalOpen} onClose={closeModal}>
+                <div className="mt-2">
+                    <div className="flex items-center ml-1 ">
+                    <button
+                        className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300  ${
+                            newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
+                        }`}
+                        onClick={toggleSwitch1}
+                    >
+                            <span
+                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                                    newAnnAccession ? 'translate-x-full' : ''}`}/>
+                    </button>
+                    {/*<span className="ml-2 text-gray-600">{newAnnAccession ? 'ON' : 'OFF'}</span>*/}
+                    <label  className="ml-3 text-xl ">NewAnnAccession</label>
+                    </div>
+
+                    {newAnnAccession && (
+                        <input
+                            type="text"
+                            placeholder="Accession Number"
+                            value={accessionNumber}
+                            className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-2"
+                            onChange={(e) => setAccessionNumber(e.target.value)}
+                        />
+                    )}
+                </div>
+            </Modal>
 
         </>
     )
