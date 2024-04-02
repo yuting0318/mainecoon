@@ -645,7 +645,7 @@ function MicroscopyViewer(props) {
             <header >
             <div className="bg-gradient-to-r from-green-400 via-green-200 to-blue-200 text-white p-1 ">
                 <div className="flex flex-row ">
-                    <Link to="/" className={"w-16 h-16 flex flex-column justify-center items-center ml-3 mt-2"}>
+                    <Link to="/" className={"w-20 h-20 flex flex-column justify-center items-center ml-3 mt-2"}>
                         <img src={mainecoon} alt="maincoon"/>
                     </Link>
                     <div className="flex justify-between items-center w-full">
@@ -656,35 +656,38 @@ function MicroscopyViewer(props) {
                         <div className="flex flex-row m-2 gap-2">
                             <div className="m-2 mt-3">
 
-                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Point')}>
-                                    <Icon icon="tabler:point-filled" className="text-black" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2"
+                                        onClick={() =>
+                                            updateDrawType('Point')
+                                }>
+                                    <Icon icon="tabler:point-filled" className="text-black  h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('LineString')}>
-                                    <Icon icon="material-symbols-light:polyline-outline" className="text-black" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('LineString')}>
+                                    <Icon icon="material-symbols-light:polyline-outline" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Polygon')}>
-                                    <Icon icon="ph:polygon" className="text-black" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Polygon')}>
+                                    <Icon icon="ph:polygon" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Rectangle')}>
-                                    <Icon icon="f7:rectangle" className="text-black" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Rectangle')}>
+                                    <Icon icon="f7:rectangle" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Ellipse')}>
-                                    <Icon icon="mdi:ellipse-outline" className="text-black" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Ellipse')}>
+                                    <Icon icon="mdi:ellipse-outline" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('ELLIPSE')}>
-                                    <Icon icon="bx:screenshot" className="text-black" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('ELLIPSE')}>
+                                    <Icon icon="bx:screenshot" className="text-black h-6 w-6" />
                                 </button>
                             </div>
 
                             <div className="flex justify-end mt-1 ">
-                                <button className="bg-[#0073ff] w-24 h-10 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2" onClick={saveAnnotations}>
-                                    儲存標記
+                                <button className="bg-[#0073ff] w-24 h-10 justify-center flex mt-3.5 mx-2 p-2 text-white rounded-3 mb-2" onClick={saveAnnotations}>
+                                    <Icon icon="ant-design:save-outlined" className="w-6 h-6 mr-2" />儲存
                                 </button>
-                                <button className="bg-[#0073ff] w-20 h-10 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2" onClick={undoFeature}>
-                                    復原
+                                <button className="bg-[#0073ff] w-24 h-10 justify-center flex mt-3.5 mx-2 p-2 text-white rounded-3 mb-2" onClick={undoFeature}>
+                                    <Icon icon="gg:undo" className="w-6 h-6 mr-2"/>復原
                                 </button>
                                 <button className="ml-6 mr-2 mb-2" onClick={() => openStuModal()} style={{ transform: 'rotate(180deg)' }}>
-                                    <Icon icon="fluent:list-28-filled" className="text-black h-5 w-5" />
+                                    <Icon icon="fluent:list-28-filled" className="text-black h-7 w-7" />
                                 </button>
 
                             </div>
@@ -699,21 +702,26 @@ function MicroscopyViewer(props) {
             <div className="flex justify-between h-100">
                 {isOpen ? (
                     <>
-                        <div className="!h-100  w-96 overflow-auto">
+                        <div className="!h-100  w-96 overflow-auto ">
 
                             {/*<div className="!h-[100rem] ">*/}
                                 <div className={`flex flex-column w-full border-end `}>
-                                    <div className="bg-opacity-100 flex justify-end items-end z-30 mt-2">
-                                        <button
-                                            className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg p-3"
-                                            onClick={LeftDrawer}>
-                                            {'<<'}
-                                        </button>
-                                    </div>
-                                    <div className="flex flex-row items-center bg-green-300 mt-2">
-                                        <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">
-                                            Patient
-                                        </label> <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
+
+                                    <div className="flex flex-row items-center bg-green-300 mt-2 justify-content-between">
+                                        <div className="flex items-center">
+                                            <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 flex items-center">
+                                                Patient
+                                                <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
+                                            </label>
+                                        </div>
+
+                                        <div className="bg-opacity-100 flex justify-end items-end z-30 ">
+                                            <button
+                                                className="flex items-center bg-gray-400 hover:bg-gray-600 text-white font-bold rounded-l-lg p-3"
+                                                onClick={LeftDrawer}>
+                                                {'<<'}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="bg-green-50">
                                         <div className="p-1.5">
@@ -772,7 +780,7 @@ function MicroscopyViewer(props) {
                 ) : (
                     <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
                         <button
-                            className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg px-2 py-5"
+                            className="flex items-center bg-gray-400 hover:bg-gray-600 text-white font-bold rounded-r-lg px-2 py-5"
                             onClick={LeftDrawer}>
                             {'>'}
                         </button>
@@ -937,7 +945,7 @@ function MicroscopyViewer(props) {
                 <div className="mt-2">
                     <div className="flex items-center ml-1 ">
                     <button
-                        className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300  ${
+                        className={`relative w-14 h-8 bg-gray-300 rounded-full focus:outline-none transition-colors duration-300 border-2 border-gray-200  ${
                             newAnnAccession ? 'bg-green-400' : 'bg-gray-300'
                         }`}
                         onClick={toggleSwitch1}
@@ -955,7 +963,7 @@ function MicroscopyViewer(props) {
                             type="text"
                             placeholder="Accession Number"
                             value={accessionNumber}
-                            className="rounded-lg border border-gray-300 p-2 w-60 ml-2 mt-2"
+                            className="rounded-lg border border-gray-300 p-2 w-full ml-2 mt-3.5"
                             onChange={(e) => setAccessionNumber(e.target.value)}
                         />
                     )}

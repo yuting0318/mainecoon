@@ -12,7 +12,6 @@ import _, { StringIterator } from "lodash";
 import SearchPageHeader from "../../components/SearchPageHeader";
 import MicroscopyViewer from "./components/microscopyViewer";
 import Header from "../../components/Header";
-import Header1 from "../../components/Header1";
 
 
 

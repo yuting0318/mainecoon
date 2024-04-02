@@ -20,21 +20,25 @@ function Modal({ isOpen, onClose, children }) {
     }
 
     return (
-        <div className={`fixed inset-0 flex items-center justify-center w-full z-50 transition-opacity duration-500 ${modalState}`}>
-            <div className="absolute inset-0 bg-gray-600/20 bg-opacity-50" onClick={onClose}></div>
+
+        <div
+            className={`fixed inset-0 flex w-full mt-20  justify-end z-50 duration-500 ${modalState}`}>
+            <div className="mr-4">
+            <div className="absolute inset-0 " onClick={onClose}></div>
             <div
-                className="bg-white p-8 rounded-lg relative z-10"
+                className="bg-white p-8 rounded-lg relative z-10 border-2 border-gray-300"
                 style={{
-                    maxHeight: '80vh',
-                    overflowY: 'auto'
+                    height: 'fit-content',
+                    maxHeight: 'calc(100vh - 40px)',
+                    overflowY: 'auto',
+                    minWidth: '20vw'
                 }}
             >
                 {children}
-                <button className="absolute top-2 right-2 text-lg" onClick={onClose}>
-                    ✕
-                </button>
+            </div>
             </div>
         </div>
+
     );
 }
 
@@ -45,5 +49,3 @@ Modal.propTypes = {
 };
 
 export default Modal;
-
-
