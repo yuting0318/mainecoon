@@ -12,6 +12,7 @@ import _, { StringIterator } from "lodash";
 import SearchPageHeader from "../../components/SearchPageHeader";
 import MicroscopyViewer from "./components/microscopyViewer";
 import Header from "../../components/Header";
+import Header1 from "../../components/Header1";
 
 
 
@@ -97,9 +98,12 @@ const WSIViewer: React.FunctionComponent = () => {
 
 
     return <>
+    {
+        (!isSuccessAnnotaionStatus) &&
         <Header />
+    }
         <div className="m-0 p-0 flex-fill">
-            <div className="d-flex h-100">
+            <div className=" h-100">
                 {
                     // !(isSuccessAnnotaionStatus) && (
                     //     <>

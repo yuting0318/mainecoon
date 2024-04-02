@@ -22,6 +22,8 @@ import Circle from 'ol/geom/Circle';
 import {QIDO_RS_Response} from "Slices/searchAreaSlice/components/enums/QIDO_RS_Response";
 import {querySeries} from "Slices/imageWithReportSlice/imageWithReportSlice";
 import Modal from "./Modal";
+import {Link} from "react-router-dom";
+import mainecoon from "../../../assests/mainecoon.png";
 
 function calculateExtremityPoints(coordinates) {
     const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
@@ -106,6 +108,7 @@ function MicroscopyViewer(props) {
 
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
+        setTimeout(function () { mapRef.current?.updateSize()},200)
     };
 
     const RightDrawer = () => {
@@ -639,130 +642,155 @@ function MicroscopyViewer(props) {
 
     return (
         <>
-            {isOpen ? (
-                <>
-                    <div className="flex flex-row w-96 overflow-y-scroll">
-                        <div className={`flex flex-column w-full border-end `}>
-                            <div className="bg-opacity-100 flex justify-end items-end z-30 mt-2">
-                                <button
-                                    className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg p-3"
-                                    onClick={LeftDrawer}>
-                                    {'<<'}
+            <header >
+            <div className="bg-gradient-to-r from-green-400 via-green-200 to-blue-200 text-white p-1 ">
+                <div className="flex flex-row ">
+                    <Link to="/" className={"w-16 h-16 flex flex-column justify-center items-center ml-3 mt-2"}>
+                        <img src={mainecoon} alt="maincoon"/>
+                    </Link>
+                    <div className="flex justify-between items-center w-full">
+                        <div>
+                            <h1 className="text-2xl mt-2 ml-2 mr-5 font-bold font-serif">MAINECOON</h1>
+                        </div>
+
+                        <div className="flex flex-row m-2 gap-2">
+                            <div className="m-2 mt-3">
+
+                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Point')}>
+                                    <Icon icon="tabler:point-filled" className="text-black" />
+                                </button>
+                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('LineString')}>
+                                    <Icon icon="material-symbols-light:polyline-outline" className="text-black" />
+                                </button>
+                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Polygon')}>
+                                    <Icon icon="ph:polygon" className="text-black" />
+                                </button>
+                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Rectangle')}>
+                                    <Icon icon="f7:rectangle" className="text-black" />
+                                </button>
+                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Ellipse')}>
+                                    <Icon icon="mdi:ellipse-outline" className="text-black" />
+                                </button>
+                                <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('ELLIPSE')}>
+                                    <Icon icon="bx:screenshot" className="text-black" />
                                 </button>
                             </div>
-                            <div className="flex flex-row items-center bg-green-300 mt-2">
-                                <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">
-                                    Patient
-                                </label> <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
+
+                            <div className="flex justify-end mt-1 ">
+                                <button className="bg-[#0073ff] w-24 h-10 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2" onClick={saveAnnotations}>
+                                    儲存標記
+                                </button>
+                                <button className="bg-[#0073ff] w-20 h-10 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2" onClick={undoFeature}>
+                                    復原
+                                </button>
+                                <button className="ml-6 mr-2 mb-2" onClick={() => openStuModal()} style={{ transform: 'rotate(180deg)' }}>
+                                    <Icon icon="fluent:list-28-filled" className="text-black h-5 w-5" />
+                                </button>
+
                             </div>
-                            <div className="bg-green-50">
-                                <div className="p-1.5">
-                                    {/*00100020,LO => 123456*/}
-                                    <span className="block ml-2 text-lg mt-2 "><span
-                                        className="font-bold">ID : </span>{patientID}</span>
-                                    {/*00100010,PN => Philips^Amy*/}
-                                    <span className="block ml-2 text-lg mt-2"><span
-                                        className="font-bold">Name : </span>{patientName}</span>
-                                    {/*00100040,CS => O*/}
-                                    <span className="block ml-2 text-lg mt-2"><span
-                                        className="font-bold">Gender : </span>{patientSex}</span>
-                                    {/*00100030,DA => 20010101*/}
-                                    <span className="block ml-2 text-lg mt-2 mb-4"><span className="font-bold">Birthday : </span>{patientBirthDate}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            </header>
+
+
+            <div className="flex justify-between h-100">
+                {isOpen ? (
+                    <>
+                        <div className="!h-100  w-96 overflow-auto">
+
+                            {/*<div className="!h-[100rem] ">*/}
+                                <div className={`flex flex-column w-full border-end `}>
+                                    <div className="bg-opacity-100 flex justify-end items-end z-30 mt-2">
+                                        <button
+                                            className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-l-lg p-3"
+                                            onClick={LeftDrawer}>
+                                            {'<<'}
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-row items-center bg-green-300 mt-2">
+                                        <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">
+                                            Patient
+                                        </label> <Icon icon="bi:people-circle" width="28" height="28" className="ml-3 text-white"/>
+                                    </div>
+                                    <div className="bg-green-50">
+                                        <div className="p-1.5">
+                                            {/*00100020,LO => 123456*/}
+                                            <span className="block ml-2 text-lg mt-2 "><span
+                                                className="font-bold">ID : </span>{patientID}</span>
+                                            {/*00100010,PN => Philips^Amy*/}
+                                            <span className="block ml-2 text-lg mt-2"><span
+                                                className="font-bold">Name : </span>{patientName}</span>
+                                            {/*00100040,CS => O*/}
+                                            <span className="block ml-2 text-lg mt-2"><span
+                                                className="font-bold">Gender : </span>{patientSex}</span>
+                                            {/*00100030,DA => 20010101*/}
+                                            <span className="block ml-2 text-lg mt-2 mb-4"><span className="font-bold">Birthday : </span>{patientBirthDate}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row items-center bg-green-300 mt-6">
+                                        <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">Case</label>
+                                        <Icon icon="fluent:document-data-16-filled" width="28" height="28" className="ml-3 text-white"/>
+                                    </div>
+                                    <div className="bg-green-50">
+                                        <div className="p-1.5">
+                                            {/*00080050,SH => D18-1001*/}
+                                            <span className="block ml-2 text-lg mt-2"><span
+                                                className="font-bold">Accession : </span>{accessionNumber2}</span>
+                                            <span className="block ml-2 text-lg mt-2"><span
+                                                className="font-bold">ID : </span></span>
+                                            {/*00080020,DA => 20181003 */}
+                                            <span className="block ml-2 text-lg mt-2"><span
+                                                className="font-bold">Date : </span>{studyDate}</span>
+                                            <span className="block ml-2 text-lg mt-2 mb-4"><span
+                                                className="font-bold">Time : </span>{StudyTime}</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-2">
+                                        <label className="ml-2 text-2xl ">SlideLabel</label>
+                                    </div>
+                                    <div className="bg-[#e8e8e8] mt-2">
+                                        <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
+                                        <p className="block ml-2 text-xl">BarcodeValue:</p>
+                                    </div>
+                                    <div>
+                                        <label className="ml-2 text-2xl">Specimens</label>
+                                    </div>
+                                    <div className="bg-[#e8e8e8] mt-2 text-xl ">
+                                        <p className="ml-2">AnatomicStructure:</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex flex-row items-center bg-green-300 mt-6">
-                                <label className="ml-5 text-2xl mt-2 font-bold font-sans mb-2 ">Case</label>
-                                <Icon icon="fluent:document-data-16-filled" width="28" height="28" className="ml-3 text-white"/>
-                            </div>
-                            <div className="bg-green-50">
-                                <div className="p-1.5">
-                                    {/*00080050,SH => D18-1001*/}
-                                    <span className="block ml-2 text-lg mt-2"><span
-                                        className="font-bold">Accession : </span>{accessionNumber2}</span>
-                                    <span className="block ml-2 text-lg mt-2"><span
-                                        className="font-bold">ID : </span></span>
-                                    {/*00080020,DA => 20181003 */}
-                                    <span className="block ml-2 text-lg mt-2"><span
-                                        className="font-bold">Date : </span>{studyDate}</span>
-                                    <span className="block ml-2 text-lg mt-2 mb-4"><span
-                                        className="font-bold">Time : </span>{StudyTime}</span>
-                                </div>
-                            </div>
-                            <div className="mt-2">
-                                <label className="ml-2 text-2xl ">SlideLabel</label>
-                            </div>
-                            <div className="bg-[#e8e8e8] mt-2">
-                                <label className="block flex items-center ml-2 text-xl mt-2">LabelText</label>
-                                <p className="block ml-2 text-xl">BarcodeValue:</p>
-                            </div>
-                            <div>
-                                <label className="ml-2 text-2xl">Specimens</label>
-                            </div>
-                            <div className="bg-[#e8e8e8] mt-2 text-xl ">
-                                <p className="ml-2">AnatomicStructure:</p>
-                            </div>
+                            {/*</div>*/}
+
+
                         </div>
 
 
-
-                    </div>
-
-
-                </>
-            ) : (
-                <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
-                    <button
-                        className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg px-2 py-5"
-                        onClick={LeftDrawer}>
-                        {'>'}
-                    </button>
-                </div>
-
-            )}
-
-
-
-            <div className="w-100 h-100 flex flex-col text-center" id={viewerID}>
-                <div className="flex flex-row justify-between m-2 gap-2 border-b-2">
-                    <div className="m-2">
-                        <button className=" mr-6  "
-                                onClick={() => openStuModal()}>
-                            <Icon icon="fluent:list-28-filled" className="text-black h-5 w-5"/>
+                    </>
+                ) : (
+                    <div className="bg-opacity-0 flex justify-start items-center z-30 mt-2">
+                        <button
+                            className="flex items-center bg-green-400 hover:bg-green-600 text-white font-bold rounded-r-lg px-2 py-5"
+                            onClick={LeftDrawer}>
+                            {'>'}
                         </button>
-                        <button className=" bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2 "
-                                onClick={() => updateDrawType('Point')}>
-                            <Icon icon="tabler:point-filled" className="text-black"/></button>
-                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                                onClick={() => updateDrawType('LineString')}>
-                            <Icon icon="material-symbols-light:polyline-outline" className="text-black"/></button>
-                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                                onClick={() => updateDrawType('Polygon')}>
-                            <Icon icon="ph:polygon" className="text-black"/></button>
-                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                                onClick={() => updateDrawType('Rectangle')}>
-                            <Icon icon="f7:rectangle" className="text-black"/></button>
-                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                                onClick={() => updateDrawType('Ellipse')}>
-                            <Icon icon="mdi:ellipse-outline" className="text-black"/></button>
-                        <button className="bg-yellow-200 rounded-lg p-2.5 mr-2 mb-2"
-                                onClick={() => updateDrawType('ELLIPSE')}>
-                            <Icon icon="bx:screenshot" className="text-black"/></button>
                     </div>
 
+                )}
 
-                    <div className="justify-end flex mb-2">
-                    <button className="bg-[#0073ff] w-24 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2"
-                            onClick={saveAnnotations}>儲存標記
-                    </button>
 
-                    <button
-                        className="bg-[#0073ff] w-20 justify-center flex mt-2 mx-2 p-2 text-white rounded-3 mb-2"
-                        onClick={undoFeature}
-                    >復原
-                    </button>
-                    </div>
+                <div className="w-100 h-100 flex flex-col text-center" id={viewerID}>
+
+                </div>
             </div>
-            </div>
+
+
+
+
+
+
             {/*{isRightOpen ? (*/}
             {/*    <div className="flex flex-row w-96">*/}
 
@@ -933,7 +961,6 @@ function MicroscopyViewer(props) {
                     )}
                 </div>
             </Modal>
-
         </>
     )
         ;
