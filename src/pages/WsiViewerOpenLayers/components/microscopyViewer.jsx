@@ -76,6 +76,27 @@ function MicroscopyViewer(props) {
     const Instances = pyramidSliceReducer.smResult?.Instances;
     const annVectorLayers = pyramidSliceReducer.annotaionResults;
 
+    function reflectFeatureVertically(feature, extent) {
+        var geometry = feature.getGeometry();
+        var centerY = (extent[1] + extent[3]) / 2; // calculate the y-coordinate of the center
+
+        geometry.applyTransform(function(flatCoordinates, flatCoordinates2, stride) {
+            for (let i = 0; i < flatCoordinates.length; i += stride) {
+                const dy = flatCoordinates[i + 1] - centerY;
+                // google
+                // flatCoordinates[i] -= flatCoordinates[i] * .185 + (extent[0] + extent[2]) * 0.005;
+                // flatCoordinates[i + 1] = (-dy + centerY) * .815 + ((extent[1] + extent[3]) * 0.19); // y-coordinate is flipped
+
+                // ntunhs
+                flatCoordinates[i] -= flatCoordinates[i] * 0.13 + (extent[0] + extent[2]) * 0;
+                flatCoordinates[i + 1] = (-dy + centerY) * .865 + ((extent[1] + extent[3]) * 0.14); // y-coordinate is flipped
+
+                // original
+                // flatCoordinates[i + 1] = (-dy + centerY); // y-coordinate is flipped
+            }
+        });
+    }
+
     const [drawType, setDrawType] = useState('Point');
     const mapRef = useRef(null);
     const sourceRef = useRef(new VectorSource({wrapX: false}));
@@ -123,6 +144,11 @@ function MicroscopyViewer(props) {
             units: 'pixels',
             extent: extent
         });
+
+        annVectorLayers.forEach((layer) => {
+            layer.getSource().forEachFeature((feature) => reflectFeatureVertically(feature, extent));
+            layer.changed();
+        })
 
         const wsiSourceXYZ = new XYZ({
             tileUrlFunction: (tileCoord) => {
