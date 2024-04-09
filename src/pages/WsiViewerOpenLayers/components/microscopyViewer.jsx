@@ -24,6 +24,9 @@ import {querySeries} from "Slices/imageWithReportSlice/imageWithReportSlice";
 import Modal from "./Modal";
 import {Link} from "react-router-dom";
 import mainecoon from "../../../assests/mainecoon.png";
+import { DragPan } from 'ol/interaction';
+import TileLayer from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
 
 function calculateExtremityPoints(coordinates) {
     const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
@@ -289,7 +292,37 @@ function MicroscopyViewer(props) {
         }
     }, [isDrawingRectangle, rectangleCenter]);
 
+    const disableDragPan = () => {
+        if (mapRef.current) {
+            //函数獲取地圖的所有交互（Interactions）。交互包括拖拽、缩放、旋轉等。
+            const interactions = mapRef.current.getInteractions();
+            //DragPan 是 OpenLayers 中負責處理地圖拖拽行為
+            const dragPan = interactions.getArray().find(interaction => interaction instanceof DragPan);
+            if (dragPan) dragPan.setActive(false);
+        }
+    };
+
+    const enableDragPan = () => {
+        if (mapRef.current) {
+            //函数獲取地圖的所有交互（Interactions）。交互包括拖拽、缩放、旋轉等。
+            const interactions = mapRef.current.getInteractions();
+            const dragPan = interactions.getArray().find(interaction => interaction instanceof DragPan);
+            if (dragPan) dragPan.setActive(true);
+        }
+    };
+
+    const handleViewer = () => {
+        enableDragPan();
+        // 2. 取消當前的繪圖操作
+        if (drawInteractionRef.current) {
+            mapRef.current.removeInteraction(drawInteractionRef.current);
+            drawInteractionRef.current = null; // 移除繪圖交互引用
+        }
+    }
+
+
     const updateDrawType = (type) => {
+        disableDragPan();
         // 如果当前正在绘制椭圆，则处理椭圆的结束逻辑
         if (isDrawingEllipse) {
             setIsDrawingEllipse(false);
@@ -605,7 +638,12 @@ function MicroscopyViewer(props) {
 
     const [isStuModalOpen, setIsStuModalOpen] = useState(false);
     const openStuModal = () => {
-        setIsStuModalOpen(true);
+        setIsStuModalOpen(!isStuModalOpen);
+        if (!isStuModalOpen) {
+            setIsStuModalOpen(true);
+        } else {
+            setIsStuModalOpen(false);
+        }
     };
     const closeModal = () => {
         setIsStuModalOpen(false);
@@ -629,10 +667,10 @@ function MicroscopyViewer(props) {
                         <div className="flex flex-row m-2 gap-2">
                             <div className="m-2 mt-3">
 
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2"
-                                        onClick={() =>
-                                            updateDrawType('Point')
-                                }>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => handleViewer()} >
+                                    <Icon icon="fa6-regular:hand" className="text-black h-6 w-6" />
+                                </button>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Point')}>
                                     <Icon icon="tabler:point-filled" className="text-black  h-6 w-6" />
                                 </button>
                                 <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('LineString')}>
