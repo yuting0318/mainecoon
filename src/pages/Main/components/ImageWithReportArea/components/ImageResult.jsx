@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {useNavigate} from 'react-router-dom';
 import _ from "lodash";
 import { Icon } from '@iconify/react';
@@ -13,6 +13,8 @@ const ImageResult = ({wadoSingleSeries}) => {
 
     const metadata = _.first(wadoSingleSeries.metadata);
     const modalityAttribute = _.get(_.get(metadata, "00080060"), "Value");
+    const T = new Set((metadata['006A0002']?.Value ?? []).flatMap((tags) => tags['00700023'].Value));
+
     const studyInstanceUID = _.get(_.get(metadata, "0020000D"), "Value");
     const seriesInstanceUID = _.get(_.get(metadata, "0020000E"), "Value");
     // 是 SM 的話就抓這些資訊顯示
@@ -45,7 +47,7 @@ const ImageResult = ({wadoSingleSeries}) => {
 
     return <>
         <div className="mt-4 ">
-            <div className="w-52 mb-2 h-56 border-4 rounded-lg shadow-xl shadow-gray-400" key="{seriesInstanceUID}" onClick={OnClick}>
+            <div className="w-full mb-2 h-[15rem] border-4 rounded-lg shadow-xl shadow-gray-400" key="{seriesInstanceUID}" onClick={OnClick}>
                 {// 將SM和ANN的內容放在同一個div內
                     (_.isEqual(_.first(modalityAttribute), "SM") || _.isEqual(_.first(modalityAttribute), "ANN")) && (
                         <div className="">
@@ -74,11 +76,14 @@ const ImageResult = ({wadoSingleSeries}) => {
                                     <>
                                         <div className=" ">
                                             <div className="flex justify-center">
-                                                <Icon icon="fluent:tag-search-24-filled" width="160" height="160" className="text-red-500/90"/>
+                                                <Icon icon="fluent:tag-search-24-filled" width="128" height="128"
+                                                      className="text-red-500/90"/>
                                             </div>
-                                            {/*<Icon icon="uiw:edit" width="160" height="160" className={"text-center"}/>*/}
+                                            <div className="flex flex-col space-y-0">
+                                                <p className="font-bold text-green-500 text-lg ml-3">{modalityAttribute}</p>
+                                                <p className="-translate-y-4 mr-3 ml-3 font-bold mb-5 text-[0.8rem] font-mono mt-2"> {Array.from(T).sort().join(', ')}</p>
+                                            </div>
 
-                                            <h5 className="mt-3 font-bold text-green-500 text-lg ml-3">{modalityAttribute}</h5>
                                         </div>
                                     </>
                                 )

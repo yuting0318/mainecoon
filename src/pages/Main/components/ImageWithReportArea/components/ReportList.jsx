@@ -27,7 +27,6 @@ const ReportList = () => {
             })
             .catch(error => console.error('Error fetching report:', error));
     };
-    console.log('reportResults',reportResults)
     return (
         <>
             {/*{*/}
@@ -46,7 +45,7 @@ const ReportList = () => {
             {reportResults && (
                 <>
                     <div className="text-green-500 flex flex-row mt-5 mb-2">
-                        <Icon icon="tabler:report-medical" width="32" height="32" className="ml-2 mr-2"/>
+                        <Icon icon="tabler:report-medical" width="32" height="32" className="ml-2 mr-2 "/>
                         <span id="report" className="ml-2 text-green-500 text-2xl font-bold ">Reports</span>
                     </div>
                     <button onClick={handleOpenReport}>

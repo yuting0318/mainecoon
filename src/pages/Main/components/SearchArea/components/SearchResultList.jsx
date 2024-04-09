@@ -10,6 +10,7 @@ const SearchResultList = () => {
     const searchAreaReducer = useAppSelector((state) => state.searchAreaSlice);
     const queryParameter = searchAreaReducer.parameter;
     const results = _.isEmpty(searchAreaReducer.results) ? [] : searchAreaReducer.results;
+    console.log('results*********************', results)
     const isNextQueryEmpty = searchAreaReducer.isNextQueryEmpty;
 
     const dispatch = useAppDispatch();

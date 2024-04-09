@@ -19,6 +19,7 @@ const SearchResult = ({ qidorsSingleStudy }) => {
     const seriesList = imageResult?.Series;
     const [seriesInstanceUIDList, setSeriesInstanceUIDList] = useState([]);
 
+    // console.log('qidorsSingleStudy', qidorsSingleStudy);
     // 整理 SeriesInstanceUIDList
     useEffect(() => {
         if (_.isEqual(imageWithReportReducer.imageResultStatus, "Success")) {

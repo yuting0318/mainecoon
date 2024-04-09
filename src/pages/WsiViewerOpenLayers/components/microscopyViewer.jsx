@@ -111,11 +111,6 @@ function MicroscopyViewer(props) {
         setTimeout(function () { mapRef.current?.updateSize()},200)
     };
 
-    const RightDrawer = () => {
-        setIsRightOpen(!isRightOpen);
-        setTimeout(function () { mapRef.current?.updateSize()},200)
-    };
-
     useEffect(() => {
         const minLevel = 0;
         const maxLevel = _.size(Instances) - 1;
@@ -187,6 +182,7 @@ function MicroscopyViewer(props) {
             coordinateFormat: createStringXY(0),
             projection: 'EPSG:4326',
         });
+        console.log('mousePositionControl',mousePositionControl)
 
         mapRef.current = new Map({
             target: viewerID,
@@ -330,28 +326,13 @@ function MicroscopyViewer(props) {
                 type: type, // 使用选定的绘图类型
                 // 可以在此处添加其他 Draw 交互的配置
             });
-
+            console.log('drawInteraction',drawInteraction)
             // 添加新的绘图交互到地图上
             mapRef.current.addInteraction(drawInteraction);
             drawnShapesStack.current.push(type);
             drawInteractionRef.current = drawInteraction;
         }
     };
-
-    function createEllipse1(center, radiusX, radiusY, rotation = 0, sides = 50) {
-        let angleStep = (2 * Math.PI) / sides;
-        let coords = [];
-
-        for (let i = 0; i < sides; i++) {
-            let angle = i * angleStep;
-            let x = center[0] + radiusX * Math.cos(angle) * Math.cos(rotation) - radiusY * Math.sin(angle) * Math.sin(rotation);
-            let y = center[1] + radiusX * Math.cos(angle) * Math.sin(rotation) + radiusY * Math.sin(angle) * Math.cos(rotation);
-            coords.push([x, y]);
-        }
-        coords.push(coords[0]); // 确保闭合椭圆
-
-        return coords;
-    }
 
     function undoFeature() {
         let features = sourceRef.current.getFeatures();
@@ -553,11 +534,6 @@ function MicroscopyViewer(props) {
         // 在這裡執行更多操作，如發送請求等
     };
 
-    const toggleSwitch = () => {
-        setNewAnnSeries(!newAnnSeries);
-    };
-
-
     const toggleSwitch1 = () => {
         setNewAnnAccession(!newAnnAccession);
     };
@@ -582,7 +558,7 @@ function MicroscopyViewer(props) {
             const response = await fetch(`https://ditto.dicom.tw/dicom-web/studies?ModalitiesInStudy=SM&StudyInstanceUID=${studyInstanceUID}`);
             const data = await response.json();
             setData(data)
-            console.log('data02313',data);console.log('data[0].0020000D',data[0]["00080020"].Value[0])
+            console.log('data02313',data);
         }catch (e) {
             console.log('error',e)
         }
@@ -596,8 +572,6 @@ function MicroscopyViewer(props) {
         return _.get(data, metadataTag) ? _.get(data, metadataTag).Value[0] : defaultValue;
         // return _.isUndefined(_.first(_.get(data, metadataTag).Value[0])) ? defaultValue : _.first(_.get(data, metadataTag).Value[0]);
         console.log('data',data)
-        // console.log('metadataTag',metadataTag)
-        // console.log('defaultValue',defaultValue)
     }
     const patientID= getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.PatientID, "PatientID NotFound");
     const patientName = _.get(getQidorsSingleStudyMetadataValue(data[0], QIDO_RS_Response.PatientName, "PatientName NotFound"), "Alphabetic");

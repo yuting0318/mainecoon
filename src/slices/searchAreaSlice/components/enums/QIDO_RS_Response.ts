@@ -11,7 +11,8 @@ enum QIDO_RS_Response {
     "StudyInstanceUID" = "0020000D",
     "StudyID" = "00200010",
     "NumberOfStudyRelatedSeries" = "00201206",
-    "NumberOfStudyRelatedInstances" = "00201208"
+    "NumberOfStudyRelatedInstances" = "00201208",
+    "Tags" = "00700023"
 }
 
 export { QIDO_RS_Response }
