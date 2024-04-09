@@ -1,3 +1,4 @@
+import './microscopyViewer.css';
 import React, {useEffect, useRef, useState} from 'react';
 import {useAppSelector} from "Hook";
 import _ from "lodash";
@@ -25,6 +26,8 @@ import Modal from "./Modal";
 import {Link} from "react-router-dom";
 import mainecoon from "../../../assests/mainecoon.png";
 import { DragPan } from 'ol/interaction';
+import {PinchZoom} from 'ol/interaction';
+
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 
@@ -84,7 +87,7 @@ function MicroscopyViewer(props) {
     const Instances = pyramidSliceReducer.smResult?.Instances;
     const annVectorLayers = pyramidSliceReducer.annotaionResults;
 
-    const [drawType, setDrawType] = useState('Point');
+    const [drawType, setDrawType] = useState(null);
     const mapRef = useRef(null);
     const sourceRef = useRef(new VectorSource({wrapX: false}));
     const [isDrawingEllipse, setIsDrawingEllipse] = useState(false);
@@ -93,6 +96,8 @@ function MicroscopyViewer(props) {
     const [isDrawingRectangle, setIsDrawingRectangle] = useState(false);
     const [rectangleCenter, setRectangleCenter] = useState(null);
     const [rectanglePreview, setRectanglePreview] = useState(null);
+    let currentFeature = null;
+    const currentFeatureCoords = [];
 
     const savedEllipsesSourceRef = useRef(new VectorSource({wrapX: false}));
     const savedRectangleSourceRef = useRef(new VectorSource({wrapX: false}));
@@ -108,6 +113,8 @@ function MicroscopyViewer(props) {
 
     // Keeps of the order in which shapes are drawn
     const drawnShapesStack = useRef([]);
+
+    let touch = false;
 
     const LeftDrawer = () => {
         setIsOpen(!isOpen);
@@ -128,6 +135,7 @@ function MicroscopyViewer(props) {
             units: 'pixels',
             extent: extent
         });
+
 
         const wsiSourceXYZ = new XYZ({
             tileUrlFunction: (tileCoord) => {
@@ -152,6 +160,7 @@ function MicroscopyViewer(props) {
                 const url = _.get(_.get(_.get(specificFrameObject, "url"), queryMode), "rendered");
                 console.log('specificFrameObject',specificFrameObject)
                 console.log('dicomProjection',dicomProjection)
+                console.log('url',url)
                 return url;
             },
             maxZoom: maxLevel,
@@ -199,6 +208,53 @@ function MicroscopyViewer(props) {
     useEffect(() => {
         if (!mapRef.current || !sourceRef.current) return;
 
+        if (drawType) {
+            const moveHandler = (evt) => {
+                if(touch){ return }
+                evt.preventDefault();
+
+                if (!currentFeature) {
+                    currentFeature = new Feature();
+                    sourceRef.current.addFeature(currentFeature);
+                }
+                if (evt.dragging) {
+                    if (drawType === 'Point') {
+                        currentFeature.setGeometry(new Point(evt.coordinate));
+                        currentFeature = null;
+                    } else if (drawType === 'LineString') {
+                        console.log(currentFeature)
+                        currentFeatureCoords.push(evt.coordinate);
+                        currentFeature.setGeometry(new LineString(currentFeatureCoords));
+                    }
+                }
+            }
+
+            const mouseUpHandler = (evt) => {
+                if (drawType === 'LineString' && currentFeatureCoords.length > 1) {
+                    console.log('currentFeatureCoords',[currentFeatureCoords])
+                    currentFeature = null;
+                    currentFeatureCoords.length = 0;
+                }
+            }
+
+            mapRef.current.on('pointermove', moveHandler);
+            mapRef.current.on('pointerup', mouseUpHandler);
+
+            if (currentFeature) {
+                currentFeature = null;
+                currentFeatureCoords.length = 0;
+            }
+
+            return () => {
+                mapRef.current.un('pointermove', moveHandler);
+                mapRef.current.un('pointerup', mouseUpHandler);
+            };
+        }
+    }, [drawType]);
+
+    useEffect(() => {
+        if (!mapRef.current || !sourceRef.current) return;
+
         // 如果正在绘制椭圆，添加事件监听
         if (isDrawingEllipse) {
             const newEllipsePreview = new Feature();
@@ -212,6 +268,7 @@ function MicroscopyViewer(props) {
                     const radiusX = calculateRadius(event.coordinate, ellipseCenter);
                     const radiusY = radiusX / 2; // 假设Y轴半径为X轴的一半
                     const ellipseCoords = createEllipse(ellipseCenter, radiusX, radiusY);
+                    console.log('[ellipseCoords]',[ellipseCoords])
                     newEllipsePreview.setGeometry(new Polygon([ellipseCoords]));
                     setIsDrawingEllipse(false); // 结束绘制
                     setEllipseCenter(null);
@@ -292,15 +349,28 @@ function MicroscopyViewer(props) {
         }
     }, [isDrawingRectangle, rectangleCenter]);
 
+    // const [drag, setTouch] = useState(true);
+
+    // 畫畫觸發
     const disableDragPan = () => {
         if (mapRef.current) {
-            //函数獲取地圖的所有交互（Interactions）。交互包括拖拽、缩放、旋轉等。
+            //函数獲取地圖的所有交互（Interactions）。交互包括拖拽。
             const interactions = mapRef.current.getInteractions();
             //DragPan 是 OpenLayers 中負責處理地圖拖拽行為
             const dragPan = interactions.getArray().find(interaction => interaction instanceof DragPan);
+            // const pinchZoom = interactions.getArray().find(interaction => interaction instanceof PinchZoom);
+            // if (pinchZoom) pinchZoom.setActive(false);
             if (dragPan) dragPan.setActive(false);
         }
     };
+
+
+    document.addEventListener('touchstart', function(e) {
+        // 檢查是否有多於一個觸摸點
+        touch =  drawType && e.touches.length > 1;
+    });
+
+
 
     const enableDragPan = () => {
         if (mapRef.current) {
@@ -308,21 +378,45 @@ function MicroscopyViewer(props) {
             const interactions = mapRef.current.getInteractions();
             const dragPan = interactions.getArray().find(interaction => interaction instanceof DragPan);
             if (dragPan) dragPan.setActive(true);
+            const pinchZoom = interactions.getArray().find(interaction => interaction instanceof PinchZoom);
+            if(pinchZoom) pinchZoom.setActive(true);
         }
     };
 
-    const handleViewer = () => {
+    const handleViewer = (e) => {
         enableDragPan();
         // 2. 取消當前的繪圖操作
         if (drawInteractionRef.current) {
+            setDrawType(null); // 重置繪圖類型（不再繪製）
+            currentFeature = null;
+            currentFeatureCoords.length = 0;
             mapRef.current.removeInteraction(drawInteractionRef.current);
             drawInteractionRef.current = null; // 移除繪圖交互引用
         }
+        setDrawType(null);
+        // Remove bounce animation
+        let target = e.target;
+        while (!target.querySelector('svg.animate-bounce')) target = target.parentElement;
+        console.log(target)
+        target.querySelector('svg.animate-bounce').classList.remove('animate-bounce');
     }
 
 
-    const updateDrawType = (type) => {
+    const updateDrawType = (e, type) => {
+
+        let prevButton = e.target;
+        for (let i = 0; !prevButton?.querySelector('svg.animate-bounce') && i < 5; i++) {
+            prevButton = prevButton.parentElement;
+        }
+        prevButton.querySelector('svg.animate-bounce')?.classList.remove('animate-bounce');
+
+        let target = e.target;
+        while (!target.querySelector('svg')) target = target.parentElement;
+        target.querySelector('svg').classList.add('animate-bounce');
+
+        setDrawType(type);
         disableDragPan();
+
         // 如果当前正在绘制椭圆，则处理椭圆的结束逻辑
         if (isDrawingEllipse) {
             setIsDrawingEllipse(false);
@@ -353,16 +447,19 @@ function MicroscopyViewer(props) {
             setIsDrawingEllipse(true);
         } else if (type === 'Rectangle') {
             setIsDrawingRectangle(true);
-        } else {
+        } else if (type === 'Polygon') {
             const drawInteraction = new Draw({
                 source: sourceRef.current,
-                type: type, // 使用选定的绘图类型
+                type, // 使用选定的绘图类型
                 // 可以在此处添加其他 Draw 交互的配置
             });
             console.log('drawInteraction',drawInteraction)
             // 添加新的绘图交互到地图上
             mapRef.current.addInteraction(drawInteraction);
             drawnShapesStack.current.push(type);
+            // if(drag){
+            //
+            // }
             drawInteractionRef.current = drawInteraction;
         }
     };
@@ -388,6 +485,12 @@ function MicroscopyViewer(props) {
                 if (features.length > 0) {
                     const lastFeature = features[features.length - 1];
                     sourceRef.current.removeFeature(lastFeature);
+                    console.log('lastFeature',lastFeature)
+                    if (drawType && currentFeature) {
+                        currentFeature = new Feature();
+                        sourceRef.current.addFeature(currentFeature);
+                        currentFeatureCoords.length = 0;
+                    }
                 }
         }
     }
@@ -667,25 +770,26 @@ function MicroscopyViewer(props) {
                         <div className="flex flex-row m-2 gap-2">
                             <div className="m-2 mt-3">
 
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => handleViewer()} >
-                                    <Icon icon="fa6-regular:hand" className="text-black h-6 w-6" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={handleViewer} >
+                                    <Icon icon="fa6-regular:hand" className="animate-bounce text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Point')}>
-                                    <Icon icon="tabler:point-filled" className="text-black  h-6 w-6" />
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2"
+                                        onClick={(e) => updateDrawType(e, 'Point')}>
+                                    <Icon icon="tabler:point-filled" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('LineString')}>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={(e) => updateDrawType(e, 'LineString')}>
                                     <Icon icon="material-symbols-light:polyline-outline" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Polygon')}>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={(e) => updateDrawType(e, 'Polygon')}>
                                     <Icon icon="ph:polygon" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Rectangle')}>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={(e) => updateDrawType(e, 'Rectangle')}>
                                     <Icon icon="f7:rectangle" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('Ellipse')}>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={(e) => updateDrawType(e, 'Ellipse')}>
                                     <Icon icon="mdi:ellipse-outline" className="text-black h-6 w-6" />
                                 </button>
-                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={() => updateDrawType('ELLIPSE')}>
+                                <button className="bg-yellow-200 hover:bg-yellow-500 rounded-lg p-2.5 mr-2 mb-2" onClick={(e) => updateDrawType(e, 'ELLIPSE')}>
                                     <Icon icon="bx:screenshot" className="text-black h-6 w-6" />
                                 </button>
                             </div>
