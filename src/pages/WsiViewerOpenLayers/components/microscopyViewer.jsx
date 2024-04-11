@@ -1,4 +1,3 @@
-import './microscopyViewer.css';
 import React, {useEffect, useRef, useState} from 'react';
 import {useAppSelector} from "Hook";
 import _ from "lodash";
