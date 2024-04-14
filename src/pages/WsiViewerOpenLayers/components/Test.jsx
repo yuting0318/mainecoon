@@ -8,7 +8,7 @@ import { Projection } from 'ol/proj';
 import { getCenter } from 'ol/extent';
 import { MousePosition, defaults as defaultControls } from 'ol/control';
 import { createStringXY } from 'ol/coordinate';
-import TileGrid from 'ol/tilegrid';
+import TileGrid from 'ol/tilegrid/TileGrid';
 import { useAppSelector } from "Hook";
 import _ from "lodash";
 
@@ -40,8 +40,11 @@ const Test = (props) => {
         console.log('Using biggest instance:', biggestInstance);
 
         const biggestInstanceMetadata = biggestInstance.metadata;
+        const imageType = biggestInstanceMetadata["00080008"].Value;
+        const isImplicitTileGrid = Instances.length > 1 || !imageType.includes('VOLUME');
         const totalPixelMatrixColumns = biggestInstanceMetadata["00480006"].Value[0];
         const totalPixelMatrixRows = biggestInstanceMetadata["00480007"].Value[0];
+        const numberOfFrames = biggestInstanceMetadata["00280008"].Value[0];
 
         const extent = [0, 0, totalPixelMatrixColumns, totalPixelMatrixRows];
         console.log('Extent set:', extent);
@@ -51,6 +54,15 @@ const Test = (props) => {
             units: 'pixels',
             extent: extent
         });
+
+        const tileGridConfig = isImplicitTileGrid ? {} : {
+            tileGrid: new TileGrid({
+                resolutions: Array.from({ length: Instances.length }, (_, i) => 2 ** i).reverse(),
+                sizes: [new Array(2).fill(Math.ceil(Math.sqrt(numberOfFrames)))],
+                extent,
+                tileSize: [biggestInstanceMetadata["00280011"].Value[0], biggestInstanceMetadata["00280011"].Value[0]]
+            })
+        };
 
         console.log('Projection set:', projection.getCode());
 
@@ -101,11 +113,10 @@ const Test = (props) => {
                         minZoom: 0,
                         maxZoom: Instances.length - 1,
                         projection,
+                        ...tileGridConfig,
                         tileSize: [biggestInstanceMetadata["00280011"].Value[0], biggestInstanceMetadata["00280011"].Value[0]]
                     }),
                     extent,
-                    minZoom: 0,
-                    maxZoom: Instances.length - 1
                 }),
                 new TileLayer({
                     source: new TileDebug({
@@ -114,7 +125,8 @@ const Test = (props) => {
                     }),
                     extent,
                     minZoom: 0,
-                    maxZoom: Instances.length - 1
+                    maxZoom: Instances.length - 1,
+                    ...tileGridConfig
                 })
             ],
             view: new View({
