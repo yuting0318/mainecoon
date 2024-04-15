@@ -143,7 +143,7 @@ const initialState: qidorsState = {
         PatientID: "*",
         StudyInstanceUID: undefined,
         StudyID: undefined,
-        limit: "10",
+        limit: "50",
         offset: "0"
     },
     results: [],

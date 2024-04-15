@@ -1,23 +1,23 @@
 // 連接自己的DICOMWebServer
 
-// module.exports = {
-//     // QIDO: {
-//     //     enableHTTPS: true,
-//     //     hostname: "ditto.dicom.tw",
-//     //     port: "",
-//     //     pathname: "/dicom-web",
-//     //     Token: null
-//     // },
-//     // WADO: {
-//     //     enableHTTPS: true,
-//     //     hostname: "ditto.dicom.tw",
-//     //     port: "",
-//     //     URI_pathname: "/dicom-web/wado",
-//     //     RS_pathname: "/dicom-web",
-//     //     Mode: "rs",
-//     //     Token: null
-//     // }
-// }\
+module.exports = {
+    QIDO: {
+        enableHTTPS: true,
+        hostname: "ditto.dicom.tw",
+        port: "",
+        pathname: "/dicom-web",
+        Token: null
+    },
+    WADO: {
+        enableHTTPS: true,
+        hostname: "ditto.dicom.tw",
+        port: "",
+        URI_pathname: "/dicom-web/wado",
+        RS_pathname: "/dicom-web",
+        Mode: "rs",
+        Token: null
+    }
+}
 
 
 // 連接J4Care的DICOMWebServer
@@ -42,21 +42,21 @@
 // };
 
 // 連接Google PACS的DICOMWebServer
-module.exports = {
-    QIDO: {
-        enableHTTPS: true,
-        hostname: "dicomwebproxy-bqmq3usc3a-uc.a.run.app",
-        port: "",
-        pathname: "dicomWeb",
-        Token: null,
-    },
-    WADO: {
-        enableHTTPS: true,
-        hostname: "dicomwebproxy-bqmq3usc3a-uc.a.run.app",
-        port: "",
-        URI_pathname: "dicomWeb",
-        RS_pathname: "dicomWeb",
-        Mode: "rs",
-        Token: null,
-    },
-};
+// module.exports = {
+//     QIDO: {
+//         enableHTTPS: true,
+//         hostname: "dicomwebproxy-bqmq3usc3a-uc.a.run.app",
+//         port: "",
+//         pathname: "dicomWeb",
+//         Token: null,
+//     },
+//     WADO: {
+//         enableHTTPS: true,
+//         hostname: "dicomwebproxy-bqmq3usc3a-uc.a.run.app",
+//         port: "",
+//         URI_pathname: "dicomWeb",
+//         RS_pathname: "dicomWeb",
+//         Mode: "rs",
+//         Token: null,
+//     },
+// };

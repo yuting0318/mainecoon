@@ -29,6 +29,8 @@ import {PinchZoom} from 'ol/interaction';
 
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
+import Test from "Pages/WsiViewerOpenLayers/components/Test";
+import TileGrid from "ol/tilegrid/TileGrid";
 
 function calculateExtremityPoints(coordinates) {
     const points = coordinates.map(coord => coord.replace(/[()]/g, '').split(',').map(Number));
@@ -85,7 +87,7 @@ function MicroscopyViewer(props) {
     const pyramidSliceReducer = useAppSelector((state) => state.pyramidSliceReducer);
     const Instances = pyramidSliceReducer.smResult?.Instances;
     const annVectorLayers = pyramidSliceReducer.annotaionResults;
-
+    console.log('annVectorLayers1213123123131321',annVectorLayers)
     const [drawType, setDrawType] = useState(null);
     const mapRef = useRef(null);
     const sourceRef = useRef(new VectorSource({wrapX: false}));
@@ -104,8 +106,6 @@ function MicroscopyViewer(props) {
 
     const [isOpen, setIsOpen] = useState(true);
     const [isRightOpen, setIsRightOpen] = useState(true);
-
-
     const [newAnnSeries, setNewAnnSeries] = useState(false);
     const [newAnnAccession, setNewAnnAccession] = useState(false);
     const [accessionNumber, setAccessionNumber] = useState('');
@@ -128,13 +128,25 @@ function MicroscopyViewer(props) {
         const totalPixelMatrixColumns = _.first(_.get(_.get(bigestInstanceMetadata, "00480006"), "Value"));
         const totalPixelMatrixRows = _.first(_.get(_.get(bigestInstanceMetadata, "00480007"), "Value"));
         const extent = [0, 0, totalPixelMatrixColumns, totalPixelMatrixRows];
+        const numberOfFrames = bigestInstanceMetadata["00280008"].Value[0];
 
         const dicomProjection = new Projection({
             code: 'DICOM',
             units: 'pixels',
             extent: extent
         });
+        const imageType = bigestInstanceMetadata["00080008"].Value;
 
+
+        const isImplicitTileGrid = Instances.length > 1 || !imageType.includes('VOLUME');
+        const tileGridConfig = isImplicitTileGrid ? {} : {
+            tileGrid: new TileGrid({
+                resolutions: Array.from({ length: Instances.length }, (_, i) => 2 ** i).reverse(),
+                sizes: [new Array(2).fill(Math.ceil(Math.sqrt(numberOfFrames)))],
+                extent,
+                tileSize: [bigestInstanceMetadata["00280011"].Value[0], bigestInstanceMetadata["00280011"].Value[0]]
+            })
+        };
 
         const wsiSourceXYZ = new XYZ({
             tileUrlFunction: (tileCoord) => {
@@ -144,6 +156,7 @@ function MicroscopyViewer(props) {
                 const currentInstance = Instances[z]; // 當前的 Instance
                 const currentInstanceMetadata = _.get(currentInstance, "metadata"); // 當前 Instance 的 Metadata
                 console.log('extent',extent)
+
                 // const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value")); // 00480006 總寬 TotalPixelMatrixColumns
                 const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value"));
                 const currentInstanceSingleImageWidth = _.first(_.get(_.get(currentInstanceMetadata, "00280011"), "Value")); // 每張小圖的寬
@@ -167,6 +180,8 @@ function MicroscopyViewer(props) {
             projection: dicomProjection,
             wrapX: false,
             interpolate: false,
+            ...tileGridConfig,
+            tileSize: [bigestInstanceMetadata["00280011"].Value[0], bigestInstanceMetadata["00280011"].Value[0]]
         });
 
 
@@ -203,6 +218,7 @@ function MicroscopyViewer(props) {
 
         });
     }, [Instances, annVectorLayers]);
+
 
     useEffect(() => {
         if (!mapRef.current || !sourceRef.current) return;
@@ -906,6 +922,7 @@ function MicroscopyViewer(props) {
                 <div className="w-100 h-100 flex flex-col text-center" id={viewerID}>
 
                 </div>
+                {/*<Test/>*/}
             </div>
 
 

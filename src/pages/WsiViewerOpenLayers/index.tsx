@@ -12,6 +12,7 @@ import _, { StringIterator } from "lodash";
 import SearchPageHeader from "../../components/SearchPageHeader";
 import MicroscopyViewer from "./components/microscopyViewer";
 import Header from "../../components/Header";
+import Test from "./components/Test";
 
 
 
@@ -119,6 +120,9 @@ const WSIViewer: React.FunctionComponent = () => {
                     (isSuccessAnnotaionStatus) &&
                         <MicroscopyViewer studyInstanceUID={studyInstanceUID} seriesInstanceUID={seriesInstanceUID} />
                 }
+                {/*{*/}
+                {/*    (isSuccessAnnotaionStatus) && <Test studyInstanceUID={studyInstanceUID} seriesInstanceUID={seriesInstanceUID} />*/}
+                {/*}*/}
             </div>
         </div>
 
