@@ -606,7 +606,7 @@ function MicroscopyViewer(props) {
             }
 
             return {type, coordinates};
-        });
+        }).filter(annotation => annotation.type !== null); // 过滤掉 type 为 null 的情况
 
         const groupedAnnotations = Object.values(savedAnnotations.reduce((acc, curr) => {
             if (acc[curr.type]) {
@@ -632,7 +632,6 @@ function MicroscopyViewer(props) {
             }
         }
 
-
         const currentUrl = window.location.href;
         const ids = extractStudyAndSeriesIdsFromUrl(currentUrl);
         if (ids) {
@@ -643,11 +642,11 @@ function MicroscopyViewer(props) {
                 OldAnnSeriesOID: seriesId,
                 NewAnnAccession: newAnnAccession ? "true" : "false",
                 AccessionNumber: accessionNumber,
-                data: savedAnnotations.map(annotation => annotation) // 原有的轉換邏輯
+                data: savedAnnotations // 原有的转换逻辑
             };
 
             console.log('Formatted Data:', formattedData);
-            //使用 formattedData 作為請求體
+            // 使用 formattedData 作为请求体
             fetch(`http://localhost:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
                 method: 'POST',
                 headers: {
@@ -658,9 +657,9 @@ function MicroscopyViewer(props) {
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
-                        toast.error("發生未知錯誤")
+                        toast.error("发生未知错误")
                     }
-                    toast.success("上傳成功")
+                    toast.success("上传成功")
                     setTimeout(() => {
                         window.location.href = '/';
                     }, 3000);
@@ -674,10 +673,10 @@ function MicroscopyViewer(props) {
                 });
         } else {
             console.error("Failed to extract study and series IDs from URL");
-            toast.error("發生未知錯誤")
+            toast.error("发生未知错误")
         }
-
     };
+
 
     const [isActive, setIsActive] = useState(false);
     const handleToggle = (e) => {
