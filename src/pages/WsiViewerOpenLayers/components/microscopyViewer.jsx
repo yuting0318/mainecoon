@@ -135,6 +135,7 @@ function MicroscopyViewer(props) {
             units: 'pixels',
             extent: extent
         });
+
         const imageType = bigestInstanceMetadata["00080008"].Value;
 
 
@@ -154,13 +155,16 @@ function MicroscopyViewer(props) {
                 const x = tileCoord[1];
                 const y = tileCoord[2];
                 const currentInstance = Instances[z]; // 當前的 Instance
+                if (!currentInstance) {
+                    console.error('Current instance is undefined.');
+                    return null;
+                }
                 const currentInstanceMetadata = _.get(currentInstance, "metadata"); // 當前 Instance 的 Metadata
-                console.log('extent',extent)
 
-                // const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value")); // 00480006 總寬 TotalPixelMatrixColumns
-                const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value"));
+                const currentInstanceTotalPixelMatrixColumns = _.first(_.get(_.get(currentInstanceMetadata, "00480006"), "Value")); // 00480006 總寬 TotalPixelMatrixColumns
                 const currentInstanceSingleImageWidth = _.first(_.get(_.get(currentInstanceMetadata, "00280011"), "Value")); // 每張小圖的寬
                 // const widthImageCount = Math.ceil(currentInstanceTotalPixelMatrixColumns / currentInstanceSingleImageWidth); // 寬度部分要擺多少張
+
                 const widthImageCount = Math.ceil(currentInstanceTotalPixelMatrixColumns / currentInstanceSingleImageWidth); // 寬度部分要擺多少張
                 const index = x + y * widthImageCount // 計算 Index
 
@@ -168,12 +172,21 @@ function MicroscopyViewer(props) {
                 const queryMode = _.get(currentInstance, "queryMode");
                 const frames = _.get(currentInstance, "Frames");
 
+                if (!frames || frames.length <= index) {
+                    console.error('Frame data is incomplete or index is out of bounds.');
+                    return null;
+                }
+
                 const specificFrameObject = _.get(frames, index);
+                if (!specificFrameObject) {
+                    console.error('Specific frame object is undefined.');
+                    return null;
+                }
+
                 const url = _.get(_.get(_.get(specificFrameObject, "url"), queryMode), "rendered");
-                console.log('specificFrameObject',specificFrameObject)
-                console.log('dicomProjection',dicomProjection)
-                console.log('url',url)
-                return url;
+                console.log('Fetched URL:', url);
+
+                return url || '';
             },
             maxZoom: maxLevel,
             minZoom: minLevel,
@@ -196,26 +209,29 @@ function MicroscopyViewer(props) {
         const view = new View({
             center: getCenter(extent),
             zoom: 2,
-            minZoom: minLevel,
-            maxZoom: maxLevel,
+            // minZoom: minLevel,
+            // maxZoom: maxLevel,
             projection: dicomProjection,
             extent: extent,
         });
-        console.log('view',view)
+
         const vector = new VectorLayer({source: sourceRef.current});
         const layers = [wsiLayer, ...annVectorLayers, vector, savedEllipsesLayer, savedRectangleLayer];
+
+        // const mousePositionControl = new MousePosition({
+        //     coordinateFormat: createStringXY(0),
+        //     projection: 'EPSG:4326',
+        // });
         const mousePositionControl = new MousePosition({
             coordinateFormat: createStringXY(0),
-            projection: 'EPSG:4326',
+            projection: 'DICOM',
         });
-        console.log('mousePositionControl',mousePositionControl)
 
         mapRef.current = new Map({
             target: viewerID,
             controls: [mousePositionControl],
             layers: layers,
             view: view,
-
         });
     }, [Instances, annVectorLayers]);
 
