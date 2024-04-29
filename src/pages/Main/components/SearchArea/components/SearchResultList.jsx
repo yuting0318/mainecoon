@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useAppSelector, useAppDispatch } from "Hook";
+import React, {useRef} from 'react';
+import {useAppDispatch, useAppSelector} from "Hook";
 import _ from "lodash";
-import { updateQueryParameter, firstQuery, getNextTenResult } from "Slices/searchAreaSlice/searchAreaSlice";
+import {getNextTenResult} from "Slices/searchAreaSlice/searchAreaSlice";
 import SearchResult from "./SearchResult";
 
-const SearchResultList = () => {
+const SearchResultList = ({onMessageChange}) => {
     const searchResultListRef = useRef();
 
     const searchAreaReducer = useAppSelector((state) => state.searchAreaSlice);
@@ -31,15 +31,34 @@ const SearchResultList = () => {
         }
     }
 
+    const handleMessageChange = (newMessage) => {
+        onMessageChange(newMessage);
+    };
+
     return (
         //  overflow-y-auto overflow-x-hidden
         <div className="flex-fill h-0 overflow-y-auto overflow-x-hidden" onScroll={onScroll} ref={searchResultListRef}
              style={{scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
-            {results.map((result) => (
-                <SearchResult key={result.id} qidorsSingleStudy={result}/>
-            ))}
+            <div className="w-full">
+                <table className="w-full mr-2 rounded-t-xl overflow-hidden">
+                    <tr>
+                        <td className="p-2 font-bold bg-green-300 rounded-lt-xl">PatientID</td>
+                        <td className="p-2 font-bold bg-green-300">PatientName</td>
+                        <td className="p-2 font-bold bg-green-300">PatientBirthDate</td>
+                        <td className="p-2 font-bold bg-green-300">PatientSex</td>
+                        <td className="p-2 font-bold bg-green-300">AccessionNumber</td>
+                        <td className="p-2 font-bold bg-green-300">StudyDate</td>
+                    </tr>
+                        {results.map((result) => (
+                                <SearchResult key={result.id} qidorsSingleStudy={result}
+                                              onMessageChange={handleMessageChange}/>
+                            )
+                        )}
+                </table>
+            </div>
         </div>
-    );
+    )
+        ;
 };
 
 export {SearchResultList};

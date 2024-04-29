@@ -55,15 +55,32 @@ const Header = ({imagesReports}) => {
     );
 };
 
-const ImageWithReportArea = () => {
+const ImageWithReportArea = ({ onMessageChange }) => {
     const imagesReports = useRef(null);
+    const handleMessageChange = () => {
+        const message = true
+        onMessageChange(false);
+    };
     return (
         <div ref={imagesReports} className="bg-opacity-25 h-full overflow-auto flex flex-col flex-grow">
+            <div>
             <Header imagesReports={imagesReports}/>
             {/*overflow-y-auto overflow-x-hidden*/}
-            <div className=" pl-5 pr-5">
-                <ImageResultList/>
-                <ReportList/>
+            <div
+                className="absolute flex flex-column justify-center items-center bg-green-500 rounded-r-lg w-8 h-28 mt-auto mb-auto cursor-pointer"
+                onClick={handleMessageChange}>
+                <div className="flex flex-row text-white text-lg font-bold" style={{writingMode: 'vertical-lr'}}>
+                    SEARCH
+                </div>
+                <Icon icon="line-md:search-twotone" className="text-white mt-1.5" width="24" height="24"/>
+
+
+            </div>
+                <div className=" pl-5 pr-5">
+
+                    <ImageResultList/>
+                    <ReportList/>
+                </div>
             </div>
 
 

@@ -1,7 +1,7 @@
-import React, {useState} from "react";
+import React from "react";
 import {useNavigate} from 'react-router-dom';
 import _ from "lodash";
-import { Icon } from '@iconify/react';
+import {Icon} from '@iconify/react';
 // import {Series} from "csy-dicomweb-wado-rs-uri";
 //
 // type ImageResultProps = {
@@ -47,7 +47,8 @@ const ImageResult = ({wadoSingleSeries}) => {
 
     return <>
         <div className="mt-4 ">
-            <div className="w-full mb-2 h-[15rem] border-4 rounded-lg shadow-xl shadow-gray-400" key="{seriesInstanceUID}" onClick={OnClick}>
+            <div className="w-full mb-2 h-[15rem] border-4 rounded-lg shadow-xl shadow-gray-400"
+                 key="{seriesInstanceUID}" onClick={OnClick}>
                 {// 將SM和ANN的內容放在同一個div內
                     (_.isEqual(_.first(modalityAttribute), "SM") || _.isEqual(_.first(modalityAttribute), "ANN")) && (
                         <div className="">
@@ -59,7 +60,7 @@ const ImageResult = ({wadoSingleSeries}) => {
                                             {/*    src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/MI_with_contraction_bands_very_high_mag.jpg/1920px-MI_with_contraction_bands_very_high_mag.jpg"*/}
                                             {/*    height={"280px"} width={"380px"}/>*/}
                                             <div className="flex justify-center">
-                                                <Icon icon="emojione-monotone:microscope" width="128" height="128" />
+                                                <Icon icon="emojione-monotone:microscope" width="128" height="128"/>
                                             </div>
                                             <div className="flex flex-col space-y-0 ">
                                                 <h5 className="text-green-500 font-bold ml-3 mt-1">{modalityAttribute}</h5>
@@ -94,8 +95,11 @@ const ImageResult = ({wadoSingleSeries}) => {
                 {// ModalityAttribute 不是 SM 或 ANN 則顯示問號
                     (!_.isEqual(_.first(modalityAttribute), "SM") && !_.isEqual(_.first(modalityAttribute), "ANN")) && (
                         <>
-                            <h5 className="text-green-500">{modalityAttribute}</h5>
-                            <Icon icon="logos:whatwg" width="120" height="120" />
+                            {/*<h5 className="text-green-500">{modalityAttribute}</h5>*/}
+                            <div className="flex justify-center">
+                                <Icon icon="logos:whatwg" width="118" height="118"/>
+                            </div>
+                            <p className="font-bold text-green-500 text-lg ml-3 mt-3">{modalityAttribute}</p>
                         </>
                     )
                 }

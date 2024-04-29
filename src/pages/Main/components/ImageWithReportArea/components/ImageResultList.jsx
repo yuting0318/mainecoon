@@ -13,7 +13,7 @@ const ImageResultList = () => {
     return (
         <div className="" style={{scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
             {!isLoading && (
-                <div className={`grid 2xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-3 p-3`}>
+                <div className={`grid 2xl:grid-cols-7 xl:grid-cols-6 lg:grid-cols-5 md:grid-cols-3 gap-3 p-3`}>
                     {seriesResults?.map((seriesResult, index) => (
                         <ImageResult key={index} wadoSingleSeries={seriesResult} />
                     ))}

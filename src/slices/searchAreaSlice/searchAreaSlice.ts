@@ -158,7 +158,7 @@ export const searchAreaSlice = createSlice({
             state.parameter = actions.payload as queryParameter;
         },
         initialLimitAndOffset: (state) => {
-            state.parameter.limit = "10";
+            state.parameter.limit = "50";
             state.parameter.offset = "0"
             state.isNextQueryEmpty = false;
         }
