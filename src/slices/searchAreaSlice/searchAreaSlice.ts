@@ -138,7 +138,7 @@ const initialState: qidorsState = {
         PatientID: "*",
         StudyInstanceUID: undefined,
         StudyID: undefined,
-        limit: "50",
+        limit: "3",
         offset: "0"
     },
     results: [],
@@ -156,9 +156,10 @@ export const searchAreaSlice = createSlice({
     reducers: {
         updateQueryParameter: (state, actions) => {
             state.parameter = actions.payload as queryParameter;
+            console.log('limit45645',state.parameter);
         },
         initialLimitAndOffset: (state) => {
-            state.parameter.limit = "50";
+            state.parameter.limit = "3";
             state.parameter.offset = "0"
             state.isNextQueryEmpty = false;
         }

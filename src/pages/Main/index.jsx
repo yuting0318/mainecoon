@@ -18,7 +18,7 @@ const UseableBlank = ({isShowMessage}) => {
     console.log('message', isShow)
     return <>
         {/*最外層*/}
-        <div className="overflow-y-auto max-w-full border-2 h-full" style={{scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
+        <div className="overflow-y-auto max-w-full border-2 h-full" style={{scrollbarWidth: 'none', 'msOverflowStyle': 'none'}}>
             <div className="flex h-full border-2 flex-cols-2">
                 {!isShow && <SearchArea onMessageChange={handleMessageChange}/>}
                 {/*<SearchArea onMessageChange={handleMessageChange}/>*/}
