@@ -65,9 +65,7 @@ const SearchResult = ({qidorsSingleStudy, onMessageChange}) => {
     let Y = 0
     const [SM, setSM] = useState(0);
     const [ANN, setANN] = useState(0);
-    // const test = seriesResults?.map((seriesResult, index) => {
-    //     console.log("seriesResult", seriesResult);
-    // });
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -83,9 +81,6 @@ const SearchResult = ({qidorsSingleStudy, onMessageChange}) => {
                     } else if (_.isEqual(_.first(Attribute), "ANN")) {
                         Y += 1
                     }
-                    console.log('modalityAttribute:', Attribute);
-                    console.log('SM:', SM);
-                    console.log('ANN:', ANN);
                 });
                 setSM(X);
                 setANN(Y);

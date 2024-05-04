@@ -156,7 +156,8 @@ export const searchAreaSlice = createSlice({
     reducers: {
         updateQueryParameter: (state, actions) => {
             state.parameter = actions.payload as queryParameter;
-            console.log('limit45645',state.parameter);
+            state.parameter.limit = state.parameter.limit;
+            console.log('limit45645',state.parameter.limit);
         },
         initialLimitAndOffset: (state) => {
             state.parameter.limit = "3";
