@@ -42,6 +42,8 @@ const ImageResult = ({wadoSingleSeries}) => {
         }
         console.log("studyInstanceUID", studyInstanceUID);
         navigate(`../WSIViewerOpenLayers/${studyInstanceUID}/${seriesInstanceUID}/${modalityAttribute}`);
+        // navigate(`../viewer/NTUNHS?studyUid=${studyInstanceUID}&seriesUid=${seriesInstanceUID}`);
+
     }
 
 

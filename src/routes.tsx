@@ -8,6 +8,8 @@ import WSIViewerOpenLayers from "Pages/WsiViewerOpenLayers";
 import WSIViewerWithReport from "Pages/WsiViewerWithReport";
 import WSIViwerByStudy from "Pages/WsiViewerByStudy";
 import SearchPageHeader from "./components/SearchPageHeader";
+import ViewerPage from './routes/viewer/[...rest]/ViewerPage';
+
 
 const routes: RouteObject[] = [
   {
@@ -15,6 +17,7 @@ const routes: RouteObject[] = [
     element: <Main />,
     children: [],
   },
+
   {
     path: "*",
     element: <NotFound />,
@@ -40,6 +43,12 @@ const routes: RouteObject[] = [
     element: <WSIViwerByStudy />,
     children: [],
   },
+    {
+        path: "/viewer/:rest",
+        element: <ViewerPage />,
+        children: [],
+    },
+
 ];
 
 export default routes;
