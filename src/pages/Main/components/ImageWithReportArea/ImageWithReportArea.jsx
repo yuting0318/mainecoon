@@ -13,6 +13,8 @@ const Header = ({imagesReports}) => {
         const element = document.getElementById("report");
         imagesReports.current.scrollTop = element.offsetTop;
     }
+
+
     return (
         <div className="bg-white border-b flex flex-row p-3">
             <div>

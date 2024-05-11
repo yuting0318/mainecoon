@@ -663,7 +663,7 @@ function MicroscopyViewer(props) {
 
             console.log('Formatted Data:', formattedData);
             // 使用 formattedData 作为请求体
-            fetch(`http://localhost:3251/api/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
+            fetch(`http://127.0.0.1:5000/SaveAnnData/studies/${studyId}/series/${seriesId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

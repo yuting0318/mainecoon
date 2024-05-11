@@ -133,7 +133,6 @@ export const computeAnnotationFeatures = async (annotations, resolutions) => {
         }
 
         console.log(coordinates)
-        console.log(coordinates)
 
         if ((graphicType === 'POLYLINE' || graphicType === 'POLYGON') && !indexes) {
             console.warn('Missing indexes data for graphic type:', graphicType);
