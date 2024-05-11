@@ -386,8 +386,10 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
         features.push(...ellipsesFeatures.map(feature => new CustomShape('ELLIPSE', feature)));
 
         const formatCoordinate = (coord) => {
-            return `(${parseFloat(coord[0].toFixed(1))}, ${parseFloat(coord[1].toFixed(1))})`;
+            return [parseFloat(coord[0].toFixed(1)), parseFloat(coord[1].toFixed(1))];
         };
+
+
 
         const savedAnnotations = features.map(feature => {
             let type = null;
@@ -404,8 +406,8 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
                 type = "POINT";
                 let coords = geometry.getCoordinates();
                 // 修改 y 轴坐标
-                coords[1] *= -1;
-                coordinates.push(coords);
+                coords = [coords[0], coords[1] * -1]; // 将坐标转换为可变数组，然后修改 y 轴坐标
+                coordinates.push(formatCoordinate(coords));
             } else if (geometry instanceof Polygon) {
                 type ??= "POLYGON";
                 let coords = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
@@ -415,19 +417,20 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
                 // 修改 y 轴坐标
                 coordinates = coords.map(coord => {
                     coord[1] *= -1;
-                    return coord;
+                    return formatCoordinate(coord);
                 });
             } else if (geometry instanceof LineString) {
                 type = "POLYLINE";
                 coordinates = geometry.getCoordinates().map(coord => {
                     // 修改 y 轴坐标
                     coord[1] *= -1;
-                    return coord;
+                    return formatCoordinate(coord);
                 });
             }
 
-            return {type, coordinates: coordinates.map(coord => formatCoordinate(coord))};
+            return { type, coordinates };
         }).filter(annotation => annotation.type !== null);
+
 
         const groupedAnnotations = Object.values(savedAnnotations.reduce((acc, curr) => {
             if (acc[curr.type]) {
