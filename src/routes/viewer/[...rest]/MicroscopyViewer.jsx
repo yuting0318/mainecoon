@@ -351,10 +351,8 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
     }
 
 
-    // Define formatCoordinate function
-    const formatCoordinate = (coord) => {
-        return `(${parseFloat(coord[0].toFixed(1))}, ${parseFloat(coord[1].toFixed(1))})`;
-    };
+
+
 
 
     function createEllipse(center, semiMajor, semiMinor, rotation = 0, sides = 50) {
@@ -386,6 +384,10 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
 
         const ellipsesFeatures = savedEllipsesSourceRef.current.getFeatures();
         features.push(...ellipsesFeatures.map(feature => new CustomShape('ELLIPSE', feature)));
+
+        const formatCoordinate = (coord) => {
+            return `(${parseFloat(coord[0].toFixed(1))}, ${parseFloat(coord[1].toFixed(1))})`;
+        };
 
         const savedAnnotations = features.map(feature => {
             let type = null;
@@ -524,7 +526,11 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
         const ellipsesFeatures = savedEllipsesSourceRef.current.getFeatures();
         features.push(...ellipsesFeatures.map(feature => new CustomShape('ELLIPSE', feature)));
 
-        // 转换为JSON格式
+
+        const formatCoordinate = (coord) => {
+            return [parseFloat(coord[0].toFixed(1)), parseFloat(coord[1].toFixed(1))];
+        };
+
         const savedAnnotations = features.map(feature => {
             let type = null;
             let coordinates = [];
@@ -538,20 +544,32 @@ const MicroscopyViewer = ({baseUrl, studyUid, seriesUid, images, annotations,dra
             const geometry = feature.getGeometry();
             if (geometry instanceof Point) {
                 type = "POINT";
-                coordinates.push(formatCoordinate(geometry.getCoordinates()));
+                let coords = geometry.getCoordinates();
+                // 修改 y 轴坐标
+                coords[1] *= -1;
+                coordinates.push(formatCoordinate(coords));
             } else if (geometry instanceof Polygon) {
                 type ??= "POLYGON";
-                coordinates = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
+                let coords = geometry.getCoordinates()[0].map(coord => formatCoordinate(coord));
                 if (type === 'ELLIPSE') {
-                    coordinates = calculateExtremityPoints(coordinates);
+                    coords = calculateExtremityPoints(coords);
                 }
+                // 修改 y 轴坐标
+                coordinates = coords.map(coord => {
+                    coord[1] *= -1;
+                    return coord;
+                });
             } else if (geometry instanceof LineString) {
                 type = "POLYLINE";
-                coordinates = geometry.getCoordinates().map(coord => formatCoordinate(coord));
+                coordinates = geometry.getCoordinates().map(coord => {
+                    // 修改 y 轴坐标
+                    coord[1] *= -1;
+                    return formatCoordinate(coord);
+                });
             }
 
-            return {type, coordinates};
-        }).filter(annotation => annotation.type !== null); // 过滤掉 type 为 null 的情况
+            return {type, coordinates: coordinates.map(coord => `(${coord[0].toFixed(1)}, ${coord[1].toFixed(1)})`)};
+        }).filter(annotation => annotation.type !== null);
 
         const groupedAnnotations = Object.values(savedAnnotations.reduce((acc, curr) => {
             if (acc[curr.type]) {
