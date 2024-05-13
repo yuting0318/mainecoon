@@ -10,7 +10,7 @@ module.exports = {
         enableHTTPS: true,
         hostname: "ditto.dicom.tw",
         port: "",
-        URI_pathname: "/dicom-web/wado",
+        URI_pathname: "/wado",
         RS_pathname: "/dicom-web",
         Mode: "rs",
         Token: null
